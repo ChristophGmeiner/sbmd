@@ -19,6 +19,6 @@ Since the schiene module is working for all DB (Deutsche Bahn) connections the u
 This notebook shows the basic functionality.
 
 ### sbahnmuc01.py
-This is a nearly production - ready script. Since the DeutscheBahn website shows only data on delays for current connections, it is the best way to schedule this script every 5 minutes for always having the latest information.
+This is a production - ready script. Since the DeutscheBahn website shows only data on delays for current connections, it is the best way to schedule this script every 5 minutes for always having the latest information.
 
-Instead of hard-coding the to and from destiantions, one could also work with rwa inputs from shell here.
+Instead of hard-coding the to and from destiantions, one could also work with raw inputs from shell here.
