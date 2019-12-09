@@ -2,7 +2,7 @@
 
 This git repo shows a way on how to gather structured and long-term delay information of the Munich S Bahn (suburban trains) for two pre-defined connections (these connections can be defined by the user).
 
-This is mainly done by the schiene python module (for more information on that, please see here: https://github.com/kennell/schiene/blob/master/README.md.
+This is mainly done by the schiene python module (for more information on that, please see here: https://github.com/kennell/schiene/blob/master/README.md). \
 Thanks for the great package to the developers.
 
 The data is derived with the Schiene packgae and stored in local instance of MongoDB. I chose MongoDB since it is for me the easiest way for loading python dicts into a database.
