@@ -41,8 +41,6 @@ for conns in statconns:
             filename = filename.replace(":", "_")
             filename = filename.replace(" ", "_")
             
-            print(conn)
-            
             s3object = s3.Object("sbahnmunich", filename)
             
             s3object.put(Body=(bytes(json.dumps(conn).encode('UTF-8'))))

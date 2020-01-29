@@ -10,39 +10,42 @@ import pickle
 s = schiene.Schiene()
 
 potential_stations = ["München", "Puchheim", "Germering", "Fürstenfeldbruck",
-                      "Olching", "Gröbenzell", "Aubing", "Lochhausen",
-                      "Langwied", "Wolfratshausen", "Starnberg", "Gernlinden",
+                      "Olching", "Gröbenzell", 
+                      "Wolfratshausen", "Starnberg", "Gernlinden",
                       "Maisach", "Mammendorf", "Schöngeising", "Geltendorf",
-                      "Buchenau", "Eichenau", "Laim", "Hirschgarten",
-                      "Donnersbergerbrücke", "Heimarnplatz", "Hackherbrücke",
+                      "Buchenau", "Eichenau", "Heimeranplatz", "Hackherbrücke",
                       "Holzkirchen", "Ebersberg", "Grafing", "Haar", 
                       "Zorneding", "Freising", "München Flughafen", 
                       "Rosenheimer Platz", "Rosenheim", "Augsburg", 
                       "Ingolstadt", "Donauwörth", "Unterhachig", "Taufkirchen",
                       "Erding", "Dachau", "Herrsching", "Tutzng", "Feldafing",
-                      "Mühldorf", "Deggendorf", "Landsberg", "Landshut",
-                      "Nürnberg", "Grafrath", "Gräfelfing", "Freiham",
-                      "Moosach", "Markt Schwaben", "Icking", "Westkreuz", 
+                      "Mühldorf am Inn", "Deggendorf", "Landsberg", "Landshut",
+                      "Nürnberg", "Grafrath", "Gräfelfing",
+                      "Markt Schwaben", "Icking", "Kempten",
                       "Planegg", "Stockdorf", "Possenhofen", "Gauting",
                       "Gilching", "Türkenfeld", "Esting", "Petershausen",
-                      "Röhrmoos", "Halbergmoos", "Ismaning", 
-                      "Unterföhring", "Johanneskirchen", "Daglfing", 
-                      "Feldkirchen", "Riem", "Heimstetten", "Poing", "Grub",
+                      "Röhrmoos", "Halbergmoos", "Ismaning", "Bayrischzell",
+                      "Unterföhring", "Daglfing", 
+                      "Heimstetten", "Poing", "Tegernsee", "Lenggriess",
                       "Aying", "Vaterstetten", "Baldham", "Steinebach",
-                      "Weßling", "Berg am Laim", "Leuchtenbergring", 
-                      "Deisenhofen", "Sauerlach", "Otterfing", "Furth", 
+                      "Weßling", "Deisenhofen", "Sauerlach", "Otterfing", 
                       "Kreuzstraße", "Ottobrunn", "Hohenbrunn",
                       "schleißheim", "Eching", "Neufahrn", "Altomünster",
-                      "Schwabhausen", "Karlsfeld", "Allach", "menzing"]
+                      "Schwabhausen", "Karlsfeld", "Kolbermoor", "Bad Aibling"]
 
 real_stations = []
 for p in potential_stations:
-    slist = s.stations(p)
+    slist = s.stations(p, limit=30)
     
     for sl in slist:
         #print(s["value"])
-        if sl["value"] not in real_stations:
+        if sl["value"] not in real_stations and p in sl["value"] :
             real_stations.append(sl["value"])
+            
+real_stations = [x for x in real_stations if x.find(",") == -1]
+real_stations = [x for x in real_stations if x.find(";") == -1]
+real_stations = [x for x in real_stations if x.find("Berlin") == -1]
+real_stations = [x for x in real_stations if x.find("Attnang") == -1]
             
 stations_iter = itertools.combinations(real_stations, 2)
 
