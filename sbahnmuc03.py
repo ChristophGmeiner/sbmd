@@ -36,10 +36,13 @@ while True:
                 if "delay" in conn.keys():
             
                     conn["date"] = str(datetime.date.today())
-                    conn["_id"] = str(conn["date"]) + "_" + conn["departure"]
+                    conn["_id"] = (str(conn["date"]) + "_" + conn["departure"]
+                                   + "_" + conns[0] + "_" + conns[1])
                     conn["timestamp"] = str(datetime.datetime.now())
                     conn["total_delay"] = (conn["delay"]["delay_departure"] 
                         + conn["delay"]["delay_arrival"])
+                    conn["start"] = conns[0]
+                    conn["end"] = conns[1]
                     
                     filename = ("DB_" + conn["_id"] + "_" + conns[0] + "_" 
                                 + conns[1] + ".json")
