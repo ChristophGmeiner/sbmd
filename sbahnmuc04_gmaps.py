@@ -20,45 +20,47 @@ with open('gapi.txt') as f:
     
 gmap = googlemaps.Client(key=api_key)
 
-now = datetime.now()
-nowstring = str(now).replace(":", "_").replace(" ", "_").replace(".", "_")\
-                    .replace("-", "_")
-
 with open("station", "rb") as f:
     fileobj = pickle.load(f)
 
 statconns = fileobj[1]
 
-i = 0
+while True:
 
-for conns in statconns:
+    i = 0
     
-    try:
-
-        results = gmap.directions(conns[0], conns[1],
-                                  mode="driving",
-                                  departure_time=now)
+    for conns in statconns:
         
-        resdict = results[0]["legs"][0]
-        del resdict["steps"]
-        
-        resdict["stat1"] = conns[0]
-        resdict["stat2"] = conns[1]
+        try:
+    
+            now = datetime.now()
+            nowstring = str(now).replace(":", "_").replace(" ", "_")\
+                        .replace(".", "_").replace("-", "_")
             
-        filename = ("Gmap_" + nowstring + "_" + conns[0] + "_" + conns[1] 
-                            + ".json")
-        filename = filename.replace(":", "_")
-        filename = filename.replace(" ", "_")
+            results = gmap.directions(conns[0], conns[1],
+                                      mode="driving",
+                                      departure_time=now)
+            
+            resdict = results[0]["legs"][0]
+            del resdict["steps"]
+            
+            resdict["stat1"] = conns[0]
+            resdict["stat2"] = conns[1]
+                
+            filename = ("Gmap_" + nowstring + "_" + conns[0] + "_" + conns[1] 
+                                + ".json")
+            filename = filename.replace(":", "_")
+            filename = filename.replace(" ", "_")
+            
+            s3object = s3.Object("sbmd2gmap", filename)
         
-        s3object = s3.Object("sbmd2gmap", filename)
-    
-        s3object.put(Body=(bytes(json.dumps(resdict).encode('UTF-8'))))
-        print(i)
-        i += 1
+            s3object.put(Body=(bytes(json.dumps(resdict).encode('UTF-8'))))
+            
+            i += 1
+            
+            
+        except:
+            print(str(i) + "failed at " + conns[0] + "-" + conns[1] + "!")
+            i += 1
         
         
-    except:
-        print(str(i) + "failed at " + conns[0] + "-" + conns[1] + "!")
-        i += 1
-    
-    
