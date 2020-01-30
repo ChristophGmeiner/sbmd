@@ -6,7 +6,7 @@ import os
 import boto3
 import pickle
 
-s3 = "s3://sbahnmunich/"
+s3 = "s3://sbahnmunich2/DB/"
 
 config = configparser.ConfigParser()
 config.read("dwh.cfg")
@@ -25,22 +25,28 @@ statconns = fileobj[1]
 
 for conns in statconns:
     
-    c = s.connections(conns[0], conns[1])
+    try:
     
-    for conn in c:
+        c = s.connections(conns[0], conns[1])
         
-        if "delay" in conn.keys():
-    
-            conn["date"] = str(datetime.date.today())
-            conn["_id"] = str(conn["date"]) + "_" + conn["departure"]
-            conn["timestamp"] = str(datetime.datetime.now())
-            conn["total_delay"] = (conn["delay"]["delay_departure"] 
-                + conn["delay"]["delay_arrival"])
+        for conn in c:
             
-            filename = conn["_id"] + "_" + conns[0] + "_" + conns[1] + ".json"
-            filename = filename.replace(":", "_")
-            filename = filename.replace(" ", "_")
-            
-            s3object = s3.Object("sbahnmunich", filename)
-            
-            s3object.put(Body=(bytes(json.dumps(conn).encode('UTF-8'))))
+            if "delay" in conn.keys():
+        
+                conn["date"] = str(datetime.date.today())
+                conn["_id"] = str(conn["date"]) + "_" + conn["departure"]
+                conn["timestamp"] = str(datetime.datetime.now())
+                conn["total_delay"] = (conn["delay"]["delay_departure"] 
+                    + conn["delay"]["delay_arrival"])
+                
+                filename = ("DB_" + conn["_id"] + "_" + conns[0] + "_" 
+                            + conns[1] + ".json")
+                filename = filename.replace(":", "_")
+                filename = filename.replace(" ", "_")
+                
+                s3object = s3.Object("sbahnmunich", filename)
+                
+                s3object.put(Body=(bytes(json.dumps(conn).encode('UTF-8'))))
+
+    except:
+        continue

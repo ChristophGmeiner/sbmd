@@ -1,11 +1,6 @@
 import schiene
-import configparser
-import os
-import boto3
 import itertools
 import pickle
-
-
 
 s = schiene.Schiene()
 
