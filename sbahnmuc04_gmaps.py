@@ -29,6 +29,8 @@ with open("station", "rb") as f:
 
 statconns = fileobj[1]
 
+i = 0
+
 for conns in statconns:
     
     try:
@@ -51,8 +53,12 @@ for conns in statconns:
         s3object = s3.Object("sbmd2gmap", filename)
     
         s3object.put(Body=(bytes(json.dumps(resdict).encode('UTF-8'))))
+        print(i)
+        i += 1
+        
         
     except:
-        continue
+        print(str(i) + "failed at " + conns[0] + "-" + conns[1] + "!")
+        i += 1
     
     

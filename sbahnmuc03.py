@@ -6,8 +6,6 @@ import os
 import boto3
 import pickle
 
-s3 = "s3://sbahnmunich2/DB/"
-
 config = configparser.ConfigParser()
 config.read("dwh.cfg")
 
@@ -22,6 +20,8 @@ with open("station", "rb") as f:
 s = schiene.Schiene()
 
 statconns = fileobj[1]
+
+i = 0
 
 for conns in statconns:
     
@@ -44,9 +44,13 @@ for conns in statconns:
                 filename = filename.replace(":", "_")
                 filename = filename.replace(" ", "_")
                 
-                s3object = s3.Object("sbahnmunich", filename)
+                s3object = s3.Object("sbmd1db", filename)
                 
                 s3object.put(Body=(bytes(json.dumps(conn).encode('UTF-8'))))
+                print(i)
+                i += 1
+                
 
     except:
-        continue
+        print(str(i) + "failed at " + conns[0] + "-" + conns[1] + "!")
+        i += 1
