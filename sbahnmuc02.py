@@ -18,14 +18,14 @@ potential_stations = ["München", "Puchheim", "Germering", "Fürstenfeldbruck",
                       "Nürnberg", "Grafrath", "Gräfelfing",
                       "Markt Schwaben", "Icking", "Kempten",
                       "Planegg", "Stockdorf", "Possenhofen", "Gauting",
-                      "Gilching", "Türkenfeld", "Esting", "Petershausen",
+                      "Gilching", "Türkenfeld", "Petershausen",
                       "Röhrmoos", "Halbergmoos", "Ismaning", "Bayrischzell",
-                      "Unterföhring", "Daglfing", 
-                      "Heimstetten", "Poing", "Tegernsee", "Lenggriess",
+                      "Unterföhring", "Daglfing", "Unterschleißheim",
+                      "Heimstetten", "Tegernsee", "Lenggriess",
                       "Aying", "Vaterstetten", "Baldham", "Steinebach",
                       "Weßling", "Deisenhofen", "Sauerlach", "Otterfing", 
                       "Kreuzstraße", "Ottobrunn", "Hohenbrunn",
-                      "schleißheim", "Eching", "Neufahrn", "Altomünster",
+                      "Oberschleißheim", "Eching", "Neufahrn", "Altomünster",
                       "Schwabhausen", "Karlsfeld", "Kolbermoor", "Bad Aibling"]
 
 real_stations = []
