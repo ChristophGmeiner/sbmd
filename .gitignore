@@ -1,3 +1,4 @@
 *.cfg
 gapi.txt
 station
+*ipynb_check*
