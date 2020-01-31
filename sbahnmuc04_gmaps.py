@@ -25,42 +25,40 @@ with open("station", "rb") as f:
 
 statconns = fileobj[1]
 
-while True:
+i = 0
 
-    i = 0
+for conns in statconns:
     
-    for conns in statconns:
+    try:
+
+        now = datetime.now()
+        nowstring = str(now).replace(":", "_").replace(" ", "_")\
+                    .replace(".", "_").replace("-", "_")
         
-        try:
+        results = gmap.directions(conns[0], conns[1],
+                                  mode="driving",
+                                  departure_time=now)
+        
+        resdict = results[0]["legs"][0]
+        del resdict["steps"]
+        
+        resdict["stat1"] = conns[0]
+        resdict["stat2"] = conns[1]
+            
+        filename = ("Gmap_" + nowstring + "_" + conns[0] + "_" + conns[1] 
+                            + ".json")
+        filename = filename.replace(":", "_")
+        filename = filename.replace(" ", "_")
+        
+        s3object = s3.Object("sbmd2gmap", filename)
     
-            now = datetime.now()
-            nowstring = str(now).replace(":", "_").replace(" ", "_")\
-                        .replace(".", "_").replace("-", "_")
-            
-            results = gmap.directions(conns[0], conns[1],
-                                      mode="driving",
-                                      departure_time=now)
-            
-            resdict = results[0]["legs"][0]
-            del resdict["steps"]
-            
-            resdict["stat1"] = conns[0]
-            resdict["stat2"] = conns[1]
-                
-            filename = ("Gmap_" + nowstring + "_" + conns[0] + "_" + conns[1] 
-                                + ".json")
-            filename = filename.replace(":", "_")
-            filename = filename.replace(" ", "_")
-            
-            s3object = s3.Object("sbmd2gmap", filename)
+        s3object.put(Body=(bytes(json.dumps(resdict).encode('UTF-8'))))
         
-            s3object.put(Body=(bytes(json.dumps(resdict).encode('UTF-8'))))
-            
-            i += 1
-            
-            
-        except:
-            print(str(i) + "failed at " + conns[0] + "-" + conns[1] + "!")
-            i += 1
+        i += 1
         
         
+    except:
+        print(str(i) + "failed at " + conns[0] + "-" + conns[1] + "!")
+        i += 1
+    
+    
