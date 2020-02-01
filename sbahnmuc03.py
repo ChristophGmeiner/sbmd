@@ -40,6 +40,8 @@ with open("station", "rb") as f:
 
 statconns = fileobj2[1]
 
+faillist = []
+
 for conns in statconns:
     
     try:
@@ -76,15 +78,12 @@ for conns in statconns:
                 i += 1
                     
 
-    except:
+    except Exception as e:
+        faillist.append(conns + "_" + e)
         
-        stdout.write("\r%d" % i + " of " +  str(allstat) 
-                                + " finished!")
-        stdout.flush()
-        
-        i += 1
-        
-        
-    
+
+with open("faillist", "wb") as f:
+    pickle.dump(faillist, f)        
+          
     
 t.toc()
