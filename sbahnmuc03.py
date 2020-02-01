@@ -6,7 +6,7 @@ import os
 import boto3
 import pickle
 from pytictoc import TicToc
-from sys import stdout
+import multiprocessing as mp
 
 t = TicToc()
 
@@ -27,63 +27,61 @@ s = schiene.Schiene()
 
 statit = fileobj[1]
 
-i = 0
-for st in statit:
-    i +=1
+def load_train(start, end):
+    '''
+    loads connection details from a Schiene object
+    start: start of the DB train connection, has to be a string and match a 
+           name of Schiene stations
+    end: end of the DB train connection, has to be a string and match a 
+         name of Schiene stations
+    '''
     
-allstat = i
+    c = s.connections(start, end)
+    
+    for conn in c:
+    
+        if "delay" in conn.keys():
+    
+            conn["date"] = str(datetime.date.today())
+            conn["_id"] = (str(conn["date"]) + "_" + conn["departure"]
+                           + "_" + start + "_" + end)
+            conn["timestamp"] = str(datetime.datetime.now())
+            conn["total_delay"] = (conn["delay"]["delay_departure"] 
+                + conn["delay"]["delay_arrival"])
+            conn["start"] = start
+            conn["end"] = end
+            
+            filename = "DB_" + conn["_id"] + ".json"
+            filename = filename.replace(":", "_")
+            filename = filename.replace(" ", "_")
+            
+            s3object = s3.Object("sbmd1db", filename)
+            
+            s3object.put(Body=(bytes(json.dumps(conn)\
+                                     .encode('UTF-8'))))
 
-i = 0
-
-with open("station", "rb") as f:
-    fileobj2 = pickle.load(f)
-
-statconns = fileobj2[1]
-
-faillist = []
-
-for conns in statconns:
+def load_trains_all(conns):
+    '''
+    runs all load_train queries for provided stations
+    conns: iterable containing 2 elements for start and end station
+    '''
     
     try:
+        load_train(conns[0], conns[1])
     
-        c = s.connections(conns[0], conns[1])
-        
-        for conn in c:
-            
-            if "delay" in conn.keys():
-        
-                conn["date"] = str(datetime.date.today())
-                conn["_id"] = (str(conn["date"]) + "_" + conn["departure"]
-                               + "_" + conns[0] + "_" + conns[1])
-                conn["timestamp"] = str(datetime.datetime.now())
-                conn["total_delay"] = (conn["delay"]["delay_departure"] 
-                    + conn["delay"]["delay_arrival"])
-                conn["start"] = conns[0]
-                conn["end"] = conns[1]
-                
-                filename = ("DB_" + conn["_id"] + "_" + conns[0] + "_" 
-                            + conns[1] + ".json")
-                filename = filename.replace(":", "_")
-                filename = filename.replace(" ", "_")
-                
-                s3object = s3.Object("sbmd1db", filename)
-                
-                s3object.put(Body=(bytes(json.dumps(conn)\
-                                         .encode('UTF-8'))))
-                             
-                stdout.write("\r%d" % i + " of " +  str(allstat) 
-                                + " finshed!")
-                stdout.flush()
-                
-                i += 1
-                    
-
     except Exception as e:
-        faillist.append(conns + "_" + e)
+        print("Error at first round for " + conns)
+        print(e)
         
-
-with open("faillist", "wb") as f:
-    pickle.dump(faillist, f)        
-          
+    try:
+        load_train(conns[1], conns[0])
     
+    except Exception as e:
+        print("Error at second round for " + conns)
+        print(e)
+        
+pool = mp.Pool(mp.cpu_count())
+
+pool.map(load_trains_all, [co for co in statit])
+        
 t.toc()
