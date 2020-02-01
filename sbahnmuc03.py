@@ -70,14 +70,14 @@ def load_trains_all(conns):
         load_train(conns[0], conns[1])
     
     except Exception as e:
-        print("Error at first round for " + conns)
+        print("Error at first round for " + conns[0] + "_" + conns[1])
         print(e)
         
     try:
         load_train(conns[1], conns[0])
     
     except Exception as e:
-        print("Error at second round for " + conns)
+        print("Error at second round for " + conns[0] + "_" + conns[1])
         print(e)
         
 pool = mp.Pool(mp.cpu_count())
