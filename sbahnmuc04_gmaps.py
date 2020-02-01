@@ -36,8 +36,13 @@ pool = mp.Pool(mp.cpu_count())
 
 def gmap_query(start, end):
     '''
-    loads
+    loads direction details of a Google Maps direction object, mode is always
+    set to driving, departure time is always current time and no other
+    restrictions are set
+    start: start of the direction, can be either a string or long/lat
+    end: end of the direction, can be either a string or long/lat
     '''
+    
     now = datetime.now()
     nowstring = str(now).replace(":", "_").replace(" ", "_")\
                 .replace(".", "_").replace("-", "_")
@@ -83,7 +88,7 @@ def gmap_query_all(c):
        gmap_query(c[1], c[0])
         
     except Exception as e:
-        print("Error at first round for " + c)
+        print("Error at second round for " + c)
         print(e)
     
 pool.map(gmap_query_all, [co for co in statconns])
