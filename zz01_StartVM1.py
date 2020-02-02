@@ -3,7 +3,7 @@ import configparser
 import os
 
 config = configparser.ConfigParser()
-config.read("dwh.cfg")
+config.read("/home/ec2-user/sbmd/dwh.cfg")
 
 ec2id = config['EC2']['ID']
 
