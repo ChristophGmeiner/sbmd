@@ -15,6 +15,9 @@ def load_train(start, end, s3key, s3skey,
            name of Schiene stations
     end: end of the DB train connection, has to be a string and match a 
          name of Schiene stations
+    s3key: AWS Access Key
+    s3skey: AWS Secret Access Key,
+    s: schiene instance
     '''
     c = s.connections(start, end)
     
@@ -48,6 +51,8 @@ def load_trains_all(conns, s3key_p, s3skey_p):
     '''
     runs all load_train queries for provided stations
     conns: iterable containing 2 elements for start and end station
+    s3key_p: AWS Access key
+    s3skey_p: AWS Secret Access Key
     '''
 
     try:
