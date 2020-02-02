@@ -1,3 +1,4 @@
+import sys
 import schiene
 import datetime
 import json
@@ -76,10 +77,10 @@ def main():
 
     t.tic()
 
-    with open("station", "rb") as f:
-        fileobj = pickle.load(f)
-
-    statit = fileobj[1]
+    with open("/home/ec2-user/sbmd/station", "rb") as f:
+        fileobj = pickle.load(f) 
+	
+    statit = fileobj[2][int(sys.argv[1])]
 
     credfile = "/home/ec2-user/sbmd/dwh.cfg"
 
