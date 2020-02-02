@@ -8,7 +8,8 @@ import pickle
 from pytictoc import TicToc
 import multiprocessing as mp
 
-def load_train(start, end, s = schiene.Schiene(), s3 = boto3.resource('s3')):
+def load_train(start, end, s = schiene.Schiene(), s3 = boto3.resource('s3'),
+               credfile = "/home/ec2-user/sbmd/dwh.cfg"):
     '''
     loads connection details from a Schiene object
     start: start of the DB train connection, has to be a string and match a 
@@ -18,6 +19,12 @@ def load_train(start, end, s = schiene.Schiene(), s3 = boto3.resource('s3')):
     '''
     
     c = s.connections(start, end)
+    
+    config = configparser.ConfigParser()
+    config.read("/home/ec2-user/sbmd/dwh.cfg")
+    
+    os.environ['AWS_ACCESS_KEY_ID']=config['AWS']['KEY']
+    os.environ['AWS_SECRET_ACCESS_KEY']=config['AWS']['SECRET']
     
     for conn in c:
     
@@ -66,12 +73,6 @@ def main():
     t = TicToc()
     
     t.tic()
-    
-    config = configparser.ConfigParser()
-    config.read("/home/ec2-user/sbmd/dwh.cfg")
-    
-    os.environ['AWS_ACCESS_KEY_ID']=config['AWS']['KEY']
-    os.environ['AWS_SECRET_ACCESS_KEY']=config['AWS']['SECRET']
     
     with open("station", "rb") as f:
         fileobj = pickle.load(f)
