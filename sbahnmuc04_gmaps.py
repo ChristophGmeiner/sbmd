@@ -8,33 +8,10 @@ from itertools import combinations
 import pytictoc
 import multiprocessing as mp
 
-t = pytictoc.TicToc()
-
-t.tic()
-
-config = configparser.ConfigParser()
-config.read("dwh.cfg")
-
-os.environ['AWS_ACCESS_KEY_ID']=config['AWS']['KEY']
-os.environ['AWS_SECRET_ACCESS_KEY']=config['AWS']['SECRET']
-
-s3 = boto3.resource('s3')
-
-with open('gapi.txt') as f:
-    api_key = f.readline()
-    f.close
-    
-gmap = googlemaps.Client(key=api_key)
-
-maps_stats = ["München-Ost", "München-Pasing", "Fürstenfeldbruck", "Landshut", 
-              "Nürnberg", "Augsburg-Rathausplatz", "Rosenheim", 
-              "München-Marienplatz"]
-
-statconns = combinations(maps_stats, 2)
-
-pool = mp.Pool(mp.cpu_count())
-
-def gmap_query(start, end):
+def gmap_query(start, end, 
+               keyfile="home/ec2-user/sbmd/gapi.txt", 
+               s3=boto3.resource('s3'), 
+               credfile="/home/ec2-user/sbmd/dwh.cfg"):
     '''
     loads direction details of a Google Maps direction object, mode is always
     set to driving, departure time is always current time and no other
@@ -43,9 +20,21 @@ def gmap_query(start, end):
     end: end of the direction, can be either a string or long/lat
     '''
     
+    with open(keyfile) as f:
+        api_key = f.readline()
+        f.close
+    
+    config = configparser.ConfigParser()
+    config.read(credfile)
+
+    os.environ['AWS_ACCESS_KEY_ID']=config['AWS']['KEY']
+    os.environ['AWS_SECRET_ACCESS_KEY']=config['AWS']['SECRET']
+    
     now = datetime.now()
     nowstring = str(now).replace(":", "_").replace(" ", "_")\
                 .replace(".", "_").replace("-", "_")
+    
+    gmap = googlemaps.Client(api_key)
     
     results = gmap.directions(start, end,
                               mode="driving",
@@ -65,7 +54,7 @@ def gmap_query(start, end):
     filename = filename.replace(":", "_")
     filename = filename.replace(" ", "_")
     
-    s3object = s3.Object("sbmd2gmap", filename)
+    s3object = s3.Object("sbmd2gmap3", filename)
 
     s3object.put(Body=(bytes(json.dumps(resdict).encode('UTF-8'))))
 
@@ -90,9 +79,26 @@ def gmap_query_all(c):
     except Exception as e:
         print("Error at second round for " + c)
         print(e)
-    
-pool.map(gmap_query_all, [co for co in statconns])
+        
+def main():
 
-pool.close()
+    t = pytictoc.TicToc()
     
-t.toc()
+    t.tic()
+
+    maps_stats = ["München-Ost", "München-Pasing", "Fürstenfeldbruck", 
+                  "Landshut", "Nürnberg", "Augsburg-Rathausplatz", "Rosenheim", 
+                  "München-Marienplatz"]
+
+    statconns = combinations(maps_stats, 2)
+
+    pool = mp.Pool(mp.cpu_count())
+
+    pool.map(gmap_query_all, [co for co in statconns])
+
+    pool.close()
+    
+    t.toc()
+    
+if __name__ == "__main__":
+    main()

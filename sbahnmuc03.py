@@ -21,7 +21,7 @@ def load_train(start, end, s = schiene.Schiene(), s3 = boto3.resource('s3'),
     c = s.connections(start, end)
     
     config = configparser.ConfigParser()
-    config.read("/home/ec2-user/sbmd/dwh.cfg")
+    config.read(credfile)
     
     os.environ['AWS_ACCESS_KEY_ID']=config['AWS']['KEY']
     os.environ['AWS_SECRET_ACCESS_KEY']=config['AWS']['SECRET']
@@ -43,7 +43,7 @@ def load_train(start, end, s = schiene.Schiene(), s3 = boto3.resource('s3'),
             filename = filename.replace(":", "_")
             filename = filename.replace(" ", "_")
             
-            s3object = s3.Object("sbmd1db", filename)
+            s3object = s3.Object("sbmd1db2", filename)
             
             s3object.put(Body=(bytes(json.dumps(conn)\
                                      .encode('UTF-8'))))
