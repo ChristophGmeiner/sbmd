@@ -36,7 +36,7 @@ def load_train(start, end, s3key, s3skey,
             filename = filename.replace(" ", "_")
             
             s3 = boto3.resource('s3',
-                                aws_access_key_id=s3k,
+                                aws_access_key_id=s3key,
                                 aws_secret_access_key= s3skey)
             
             s3object = s3.Object("sbmd1db2", filename)
@@ -77,9 +77,6 @@ def main():
     statit = fileobj[1]
 
     credfile = "/home/ec2-user/sbmd/dwh.cfg"
-
-    config = configparser.ConfigParser()
-    config.read(credfile)
 
     config = configparser.ConfigParser()
     config.read(credfile)
