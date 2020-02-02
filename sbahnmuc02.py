@@ -76,7 +76,7 @@ def main():
     real_stations.remove('Mittenwalde b Templin Dorf')
     real_stations.remove("Haarhausen")
     
-    real_stations = [x.encode("utf-8") for x in real_stations]
+    #real_stations = [x.encode("utf-8") for x in real_stations]
                 
     stations_iter = itertools.combinations(real_stations, 2)
     
