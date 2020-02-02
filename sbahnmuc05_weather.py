@@ -7,8 +7,7 @@ import boto3
 import multiprocessing as mp
 
 def load_weather(c, s3key, s3skey, 
-                 owmfile = "/home/ec2-user/sbmd/owm.txt",
-                 credfile = "/home/ec2-user/sbmd/dwh.cfg"):
+                 owmfile = "/home/ec2-user/sbmd/owm.txt"):
     
         try:
             
@@ -72,6 +71,7 @@ def main():
               "Oberschleißheim", "Eching", "Neufahrn", "Altomünster",
               "Schwabhausen", "Karlsfeld", "Kolbermoor", "Bad Aibling"]
     
+    credfile = "/home/ec2-user/sbmd/dwh.cfg"
     config = configparser.ConfigParser()
     config.read(credfile)
             
