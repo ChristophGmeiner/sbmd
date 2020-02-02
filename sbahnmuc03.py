@@ -9,7 +9,8 @@ from pytictoc import TicToc
 import multiprocessing as mp
 
 def load_train(start, end, s = schiene.Schiene(), s3 = boto3.resource('s3'),
-               credfile = "/home/ec2-user/sbmd/dwh.cfg"):
+              s3key_p=os.environ['AWS_ACCESS_KEY_ID'], 
+              s3skey_p=os.environ['AWS_SECRET_ACCESS_KEY']):
     '''
     loads connection details from a Schiene object
     start: start of the DB train connection, has to be a string and match a 
@@ -18,13 +19,10 @@ def load_train(start, end, s = schiene.Schiene(), s3 = boto3.resource('s3'),
          name of Schiene stations
     '''
     
+    os.environ['AWS_ACCESS_KEY_ID'] = s3key_p
+    os.environ['AWS_SECRET_ACCESS_KEY'] = s3skey_p
+    
     c = s.connections(start, end)
-    
-    config = configparser.ConfigParser()
-    config.read(credfile)
-    
-    os.environ['AWS_ACCESS_KEY_ID']=config['AWS']['KEY']
-    os.environ['AWS_SECRET_ACCESS_KEY']=config['AWS']['SECRET']
     
     for conn in c:
     
@@ -46,7 +44,7 @@ def load_train(start, end, s = schiene.Schiene(), s3 = boto3.resource('s3'),
             s3object = s3.Object("sbmd1db2", filename)
             
             s3object.put(Body=(bytes(json.dumps(conn)\
-                                     .encode('UTF-8'))))
+                                     .encode('utf-8'))))
 
 def load_trains_all(conns):
     '''
@@ -71,15 +69,21 @@ def load_trains_all(conns):
 def main():
 
     t = TicToc()
-    
+
     t.tic()
-    
+
     with open("station", "rb") as f:
         fileobj = pickle.load(f)
-    
+
     statit = fileobj[1]
-    
-    
+
+    credfile = "/home/ec2-user/sbmd/dwh.cfg"
+
+    config = configparser.ConfigParser()
+    config.read(credfile)
+
+    os.environ['AWS_ACCESS_KEY_ID']=config['AWS']['KEY']
+    os.environ['AWS_SECRET_ACCESS_KEY']=config['AWS']['SECRET']
             
     pool = mp.Pool(mp.cpu_count())
     
