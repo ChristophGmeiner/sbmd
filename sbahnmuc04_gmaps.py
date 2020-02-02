@@ -1,34 +1,22 @@
 import googlemaps
 from datetime import datetime
 import boto3
-import configparser
-import os
 import json
 from itertools import combinations
 import pytictoc
 import multiprocessing as mp
 
-def gmap_query(start, end, 
-               keyfile="home/ec2-user/sbmd/gapi.txt", 
-               s3=boto3.resource('s3'), 
-               credfile="/home/ec2-user/sbmd/dwh.cfg"):
+def gmap_query(start, end, s3key, s3skey, api_key):
     '''
     loads direction details of a Google Maps direction object, mode is always
     set to driving, departure time is always current time and no other
     restrictions are set
     start: start of the direction, can be either a string or long/lat
     end: end of the direction, can be either a string or long/lat
+    s3key: AWS Access Key
+    s3skey: AWS SECRET Access Key
+    api_key: Google Maps API Key
     '''
-    
-    with open(keyfile) as f:
-        api_key = f.readline()
-        f.close
-    
-    config = configparser.ConfigParser()
-    config.read(credfile)
-
-    os.environ['AWS_ACCESS_KEY_ID']=config['AWS']['KEY']
-    os.environ['AWS_SECRET_ACCESS_KEY']=config['AWS']['SECRET']
     
     now = datetime.now()
     nowstring = str(now).replace(":", "_").replace(" ", "_")\
@@ -54,19 +42,26 @@ def gmap_query(start, end,
     filename = filename.replace(":", "_")
     filename = filename.replace(" ", "_")
     
+    s3 = boto3.resource('s3',
+                         aws_access_key_id=s3key,
+                         aws_secret_access_key= s3skey)
+    
     s3object = s3.Object("sbmd2gmap3", filename)
 
     s3object.put(Body=(bytes(json.dumps(resdict).encode('UTF-8'))))
 
-def gmap_query_all(c):
+def gmap_query_all(c, s3key_p, s3skey_p, api_key_p):
     '''
     runs all gmap queries for provided stations
     c: iterable containing 2 elements for start and stop station
+    s3key_p: AWS Access Key
+    s3skey_p: AWS SECRET Access Key
+    api_key_p: Google Maps API Key
     '''
     
     try:
         
-       gmap_query(c[0], c[1])
+       gmap_query(c[0], c[1], s3key_p, s3skey_p, api_key_p)
         
     except Exception as e:
         print("Error at first round for " + c)
@@ -74,7 +69,7 @@ def gmap_query_all(c):
         
     try:
         
-       gmap_query(c[1], c[0])
+       gmap_query(c[1], c[0], s3key_p, s3skey_p, api_key_p)
         
     except Exception as e:
         print("Error at second round for " + c)
@@ -91,10 +86,22 @@ def main():
                   "München-Marienplatz"]
 
     statconns = combinations(maps_stats, 2)
+    
+    keyfile = "/home/ec2-user/sbmd/gapi-txt"
+    with open(keyfile) as f:
+        ak= f.readline()
+        f.close
+    
+    credfile="/home/ec2-user/sbmd/dwh.cfg"
+    config = configparser.ConfigParser()
+    config.read(credfile)
+
+    s3k = config['AWS']['KEY']
+    s3ks = config['AWS']['SECRET']
 
     pool = mp.Pool(mp.cpu_count())
 
-    pool.map(gmap_query_all, [co for co in statconns])
+    [pool.apply(gmap_query_all, args=(co, s3k, s3ks, ak)) for co in statconns]
 
     pool.close()
     
