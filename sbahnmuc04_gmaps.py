@@ -1,6 +1,7 @@
 import googlemaps
 from datetime import datetime
 import boto3
+import configparser
 import json
 from itertools import combinations
 import pytictoc
@@ -87,7 +88,7 @@ def main():
 
     statconns = combinations(maps_stats, 2)
     
-    keyfile = "/home/ec2-user/sbmd/gapi-txt"
+    keyfile = "/home/ec2-user/sbmd/gapi.txt"
     with open(keyfile) as f:
         ak= f.readline()
         f.close
