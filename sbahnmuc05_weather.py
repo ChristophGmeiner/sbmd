@@ -6,19 +6,12 @@ import pyowm
 import boto3
 import multiprocessing as mp
 
-def load_weather(c, s3=boto3.resource('s3'), 
+def load_weather(c, s3key, s3skey, 
                  owmfile = "/home/ec2-user/sbmd/owm.txt",
                  credfile = "/home/ec2-user/sbmd/dwh.cfg"):
     
         try:
             
-            config = configparser.ConfigParser()
-            config.read(credfile)
-            
-            os.environ['AWS_ACCESS_KEY_ID']=config['AWS']['KEY']
-            os.environ['AWS_SECRET_ACCESS_KEY']=config['AWS']['SECRET']
-            
-            #s3key = config["AWS"]["KEY"]
             
             with open(owmfile, "r") as f:
                 owmapi = f.readline()
@@ -36,6 +29,10 @@ def load_weather(c, s3=boto3.resource('s3'),
             
             with open (filename, "w") as f:
                 f.write(jf)
+                
+            s3 = boto3.resource('s3',
+                         aws_access_key_id=s3key,
+                         aws_secret_access_key= s3skey)
                 
             bucket = s3.Bucket("sbmd3weather2")
                 
@@ -75,9 +72,13 @@ def main():
               "Oberschleißheim", "Eching", "Neufahrn", "Altomünster",
               "Schwabhausen", "Karlsfeld", "Kolbermoor", "Bad Aibling"]
     
-    
+    config = configparser.ConfigParser()
+    config.read(credfile)
+            
+    s3k = config['AWS']['KEY']
+    s3ks = config['AWS']['SECRET']
                 
-    pool.map(load_weather, [c for c in cities])
+    [pool.apply(load_weather, args=(c, s3k, s3ks)) for c in cities]
     
     pool.close()
         
