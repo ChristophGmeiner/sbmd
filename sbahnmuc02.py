@@ -4,6 +4,7 @@ import pickle
 import pytictoc
 import multiprocessing as mp
 from itertools import chain
+import numpy as np
 
 def all_station(p, s_object=schiene.Schiene()):
     '''
@@ -75,12 +76,17 @@ def main():
     real_stations.remove("Steinebach an der Wied Ort")
     real_stations.remove('Mittenwalde b Templin Dorf')
     real_stations.remove("Haarhausen")
-    
-    #real_stations = [x.encode("utf-8") for x in real_stations]
                 
     stations_iter = itertools.combinations(real_stations, 2)
     
-    fileobj = [real_stations, stations_iter]
+    stations_iter_list = []
+    
+    for sta in stations_iter:
+        stations_iter_list.append(sta)
+        
+    stations_iter_parts_list = np.array_split(stations_iter_list, 10)
+    
+    fileobj = [real_stations, stations_iter, stations_iter_parts_list]
     
     with open("station", "wb") as sf:
         pickle.dump(fileobj, sf)
