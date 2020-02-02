@@ -7,7 +7,6 @@ import boto3
 import multiprocessing as mp
 
 def load_weather(c, s3=boto3.resource('s3'), 
-                 bucket="/home/ec2-user/sbmd/dwh.cfg",
                  owmfile = "/home/ec2-user/sbmd/owm.txt",
                  credfile = "/home/ec2-user/sbmd/dwh.cfg"):
     
@@ -24,6 +23,8 @@ def load_weather(c, s3=boto3.resource('s3'),
             with open(owmfile, "r") as f:
                 owmapi = f.readline()
 
+            owmapi = owmapi.replace("\n", "")
+
             owm = pyowm.OWM(owmapi) 
     
             obs = owm.weather_at_place(c + ", DE")
@@ -33,12 +34,12 @@ def load_weather(c, s3=boto3.resource('s3'),
                                        .replace(":", "_").replace(" ", "_")
             filename = c + "_" + now + "_" + ".json"
             
-            with open ("test/" + filename, "w") as f:
+            with open (filename, "w") as f:
                 f.write(jf)
                 
             bucket = s3.Bucket("sbmd3weather2")
                 
-            bucket.upload_file("test/" + filename, filename)
+            bucket.upload_file(filename, filename)
             
         except Exception as e:
             print(c)
