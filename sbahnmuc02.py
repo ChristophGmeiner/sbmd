@@ -88,7 +88,7 @@ def main():
     
     fileobj = [real_stations, stations_iter, stations_iter_parts_list]
     
-    with open("station", "wb") as sf:
+    with open("sbmd/station", "wb") as sf:
         pickle.dump(fileobj, sf)
     
     print(t.toc())
