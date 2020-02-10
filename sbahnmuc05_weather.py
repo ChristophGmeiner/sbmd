@@ -1,6 +1,5 @@
 import datetime
 import configparser
-import os
 from pytictoc import TicToc
 import pyowm
 import boto3
