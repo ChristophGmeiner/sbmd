@@ -1,5 +1,7 @@
 import schiene
 import itertools
+import configparser
+import boto3
 import pickle
 import pytictoc
 import multiprocessing as mp
@@ -90,6 +92,20 @@ def main():
     
     with open("/home/ec2-user/sbmd/station", "wb") as sf:
         pickle.dump(fileobj, sf)
+        
+    credfile = "/home/ec2-user/sbmd/dwh.cfg"
+
+    config = configparser.ConfigParser()
+    config.read(credfile)
+
+    s3k = config['AWS']['KEY']
+    s3ks = config['AWS']['SECRET']
+    
+    s3 = boto3.resource('s3',
+                aws_access_key_id=s3k,
+                aws_secret_access_key= s3ks)
+    s3.meta.client.upload_file("/home/ec2-user/sbmd/station", "sbmdother", 
+                               "station")
     
     print(t.toc())
     
