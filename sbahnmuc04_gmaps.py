@@ -37,7 +37,7 @@ def gmap_query(start, end, s3key, s3skey, api_key):
     
     resdict["stat1"] = start
     resdict["stat2"] = end
-    resdict["timestamp"] = datetime.now()
+    resdict["timestamp"] = str(datetime.now())
         
     filename = ("Gmap_" + nowstring + "_" + start + "_" + end 
                         + ".json")
