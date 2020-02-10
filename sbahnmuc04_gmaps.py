@@ -1,5 +1,6 @@
 import googlemaps
 from datetime import datetime
+import pytz
 import boto3
 import configparser
 import json
@@ -37,7 +38,7 @@ def gmap_query(start, end, s3key, s3skey, api_key):
     
     resdict["stat1"] = start
     resdict["stat2"] = end
-    resdict["timestamp"] = str(datetime.now())
+    resdict["timestamp"] = str(datetime.now(tz=pytz.timezone("Europe/Berlin")))
         
     filename = ("Gmap_" + nowstring + "_" + start + "_" + end 
                         + ".json")

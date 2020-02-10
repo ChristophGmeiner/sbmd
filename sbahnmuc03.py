@@ -1,6 +1,7 @@
 import sys
 import schiene
 import datetime
+import pytz
 import json
 import configparser
 import boto3
@@ -29,7 +30,8 @@ def load_train(start, end, s3key, s3skey,
             conn["date"] = str(datetime.date.today())
             conn["_id"] = (str(conn["date"]) + "_" + conn["departure"]
                            + "_" + start + "_" + end)
-            conn["timestamp"] = str(datetime.datetime.now())
+            conn["timestamp"] = str(datetime.datetime.now(
+                                            tz=pytz.timezone("Europe/Berlin")))
             conn["total_delay"] = (conn["delay"]["delay_departure"] 
                 + conn["delay"]["delay_arrival"])
             conn["start"] = start
