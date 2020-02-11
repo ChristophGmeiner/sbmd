@@ -4,3 +4,5 @@ station
 *ipynb_check*
 owm.txt
 *.json
+*.ipynb
+stamp*
