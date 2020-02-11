@@ -77,6 +77,7 @@ engine = create_engine(constring)
 base_df.to_sql('t_w01_stagings', engine, if_exists='replace', 
                         index=False)
 
+client = boto3.client("rds", region_name="eu-central-1")
 response = client.stop_db_instance(DBInstanceIdentifier=rdsid)
 
 t.toc()
