@@ -81,7 +81,7 @@ conn = psycopg2.connect(
 cur = conn.cursor()
 
 output = io.StringIO()
-base_df.to_csv(output, sep='\t', header=True, index=False)
+base_df.to_csv(output, sep='\t', header=False, index=False)
 output.seek(0)
 contents = output.getvalue()
 
