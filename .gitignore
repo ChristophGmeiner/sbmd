@@ -6,3 +6,4 @@ owm.txt
 *.json
 *.ipynb
 stamp*
+*.csv
