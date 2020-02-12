@@ -7,6 +7,7 @@ import pytictoc
 from sqlalchemy import create_engine
 import pickle
 import sys
+import datetime
 
 t = pytictoc.TicToc()
 t.tic()
@@ -43,6 +44,12 @@ BUCKET = "sbmd3weather2"
 bucket = s3r.Bucket(BUCKET)
 objsr_all = bucket.objects.all()
 client = boto3.client("s3")
+archivfoldername = str(datetime.date.today()) + "-ArchivWeather/"
+response = client.put_object(
+        Bucket=BUCKET,
+        Body="",
+        Key=archivfoldername)
+s3res = boto3.resource("s3")
 
 i = 0
 s3r_files = []
@@ -62,6 +69,11 @@ result = client.get_object(Bucket=BUCKET, Key=basefile)
 text = json.loads(result["Body"].read().decode())
 base_df = pd.io.json.json_normalize(text, sep="_")
 
+copy_source = {"Bucket": BUCKET, "Key": s3r_files[0]}
+s3res.Object(BUCKET, archivfoldername).copy_from(copy_source)
+s3res.Object(BUCKET, s3r_files[0]).delete()
+
+
 FILE_TO_READ = s3r_files[0]
 client = boto3.client('s3')
 df_list = []
@@ -70,6 +82,11 @@ for file in s3r_files[1:]:
     text = json.loads(result["Body"].read().decode())
     df = pd.io.json.json_normalize(text, sep="_")
     base_df = pd.concat([base_df, df], axis=0, ignore_index=True)
+    
+    #archiving
+    copy_source = {"Bucket": BUCKET, "Key": file}
+    s3res.Object(BUCKET, archivfoldername).copy_from(copy_source)
+    s3res.Object(BUCKET, file).delete()
 
 constring = "postgresql+psycopg2://sbmdmaster:" +rdspw + \
             "@sbmd.cfv4eklkdk8x.eu-central-1.rds.amazonaws.com:5432/sbmd1"
