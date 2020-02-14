@@ -25,18 +25,6 @@ rdspw = config["RDS"]["PW"]
 
 os.environ['AWS_ACCESS_KEY_ID']=config['AWS']['KEY']
 os.environ['AWS_SECRET_ACCESS_KEY']=config['AWS']['SECRET']
-
-client = boto3.client("rds", region_name="eu-central-1")
-dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
-dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
-
-if dbstate != 'available':
-    response = client.start_db_instance(DBInstanceIdentifier=rdsid)
-
-    while dbstate != "available":
-        dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
-        dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
-        Printer(dbstate)
     
 s3r = boto3.resource("s3")
 BUCKET = "sbmd2gmap3"
@@ -82,6 +70,19 @@ for file in s3r_files[1:]:
     dest = s3res.Object(BUCKET, archivfoldername + copy_source["Key"])
     dest.copy(CopySource=copy_source)
     response = s3res.Object(BUCKET, file).delete()
+    
+
+client = boto3.client("rds", region_name="eu-central-1")
+dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
+dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
+
+if dbstate != 'available':
+    response = client.start_db_instance(DBInstanceIdentifier=rdsid)
+
+    while dbstate != "available":
+        dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
+        dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
+        Printer(dbstate)
 
 constring = "postgresql+psycopg2://sbmdmaster:" +rdspw + \
             "@sbmd.cfv4eklkdk8x.eu-central-1.rds.amazonaws.com:5432/sbmd1"

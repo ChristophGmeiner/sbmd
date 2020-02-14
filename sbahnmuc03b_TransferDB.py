@@ -32,14 +32,6 @@ os.environ['AWS_SECRET_ACCESS_KEY']=config['AWS']['SECRET']
 client = boto3.client("rds", region_name="eu-central-1")
 dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
 dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
-
-if dbstate != 'available':
-    response = client.start_db_instance(DBInstanceIdentifier=rdsid)
-
-    while dbstate != "available":
-        dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
-        dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
-        Printer(dbstate)
     
 s3r = boto3.resource("s3")
 BUCKET = "sbmd1db2"
@@ -84,7 +76,15 @@ for file in s3r_files[1:]:
     dest = s3res.Object(BUCKET, archivfoldername + copy_source["Key"])
     dest.copy(CopySource=copy_source)
     response = s3res.Object(BUCKET, file).delete()
-        
+
+
+if dbstate != 'available':
+    response = client.start_db_instance(DBInstanceIdentifier=rdsid)
+
+    while dbstate != "available":
+        dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
+        dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
+        Printer(dbstate)
     
 conn = psycopg2.connect(
         host="sbmd.cfv4eklkdk8x.eu-central-1.rds.amazonaws.com", 
@@ -107,12 +107,5 @@ conn.commit()
 conn.close()
 
 #stop in 05 transfer
-
-#archiving
-
-
-
-
-
 
 t.toc()
