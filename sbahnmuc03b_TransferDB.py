@@ -81,8 +81,9 @@ for file in s3r_files[1:]:
     
     #archiving
     copy_source = {"Bucket": BUCKET, "Key": file}
-    s3res.Object(BUCKET, archivfoldername).copy_from(copy_source)
-    s3res.Object(BUCKET, file).delete()
+    dest = s3res.Object(BUCKET, archivfoldername + copy_source["Key"])
+    dest.copy(CopySource=copy_source)
+    response = s3res.Object(BUCKET, file).delete()
         
     
 conn = psycopg2.connect(
