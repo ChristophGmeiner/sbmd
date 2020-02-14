@@ -7,6 +7,7 @@ import pytictoc
 from sqlalchemy import create_engine
 import sys
 import datetime
+import logging
 
 t = pytictoc.TicToc()
 t.tic()
@@ -70,25 +71,32 @@ for file in s3r_files[1:]:
     dest = s3res.Object(BUCKET, archivfoldername + copy_source["Key"])
     dest.copy(CopySource=copy_source)
     response = s3res.Object(BUCKET, file).delete()
-    
 
-client = boto3.client("rds", region_name="eu-central-1")
-dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
-dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
+try:
 
-if dbstate != 'available':
-    response = client.start_db_instance(DBInstanceIdentifier=rdsid)
+    client = boto3.client("rds", region_name="eu-central-1")
+    dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
+    dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
 
-    while dbstate != "available":
-        dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
-        dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
-        Printer(dbstate)
+    if dbstate != 'available':
+        response = client.start_db_instance(DBInstanceIdentifier=rdsid)
 
-constring = "postgresql+psycopg2://sbmdmaster:" +rdspw + \
-            "@sbmd.cfv4eklkdk8x.eu-central-1.rds.amazonaws.com:5432/sbmd1"
-engine = create_engine(constring)
-base_df.to_sql('t_gmap01_stagings', engine, if_exists='replace', 
-                        index=False)
+        while dbstate != "available":
+            dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
+            dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
+            Printer(dbstate)
+
+    constring = "postgresql+psycopg2://sbmdmaster:" +rdspw + \
+                "@sbmd.cfv4eklkdk8x.eu-central-1.rds.amazonaws.com:5432/sbmd1"
+    engine = create_engine(constring)
+    base_df.to_sql('t_gmap01_stagings', engine, if_exists='replace', 
+                            index=False)
+
+except Exception:
+    base_df_filename = str(datetime.date.today()) + "_Gmap_DF.csv"
+    base_df.to_csv(path="/home/ec2-user/sbmd/" + base_df_filename)
+    today = str(datetime.date.today())
+    logging.info(f"Gmap CSV created for upload from {today}")
 
 #stop in 05 transfer
 

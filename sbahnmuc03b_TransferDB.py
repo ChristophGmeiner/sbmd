@@ -10,6 +10,7 @@ import io
 from sqlalchemy import create_engine
 import sys
 import datetime
+import logging
 
 t = pytictoc.TicToc()
 t.tic()
@@ -29,10 +30,6 @@ rdspw = config["RDS"]["PW"]
 os.environ['AWS_ACCESS_KEY_ID']=config['AWS']['KEY']
 os.environ['AWS_SECRET_ACCESS_KEY']=config['AWS']['SECRET']
 
-client = boto3.client("rds", region_name="eu-central-1")
-dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
-dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
-    
 s3r = boto3.resource("s3")
 BUCKET = "sbmd1db2"
 bucket = s3r.Bucket(BUCKET)
@@ -77,34 +74,45 @@ for file in s3r_files[1:]:
     dest.copy(CopySource=copy_source)
     response = s3res.Object(BUCKET, file).delete()
 
+try: 
 
-if dbstate != 'available':
-    response = client.start_db_instance(DBInstanceIdentifier=rdsid)
-
-    while dbstate != "available":
-        dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
-        dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
-        Printer(dbstate)
+    client = boto3.client("rds", region_name="eu-central-1")
+    dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
+    dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
     
-conn = psycopg2.connect(
-        host="sbmd.cfv4eklkdk8x.eu-central-1.rds.amazonaws.com", 
-        dbname="sbmd1", port=5432, user="sbmdmaster", password=rdspw)
+    if dbstate != 'available':
+        response = client.start_db_instance(DBInstanceIdentifier=rdsid)
 
-cur = conn.cursor()
+        while dbstate != "available":
+            dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
+            dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
+            Printer(dbstate)
 
-output = io.StringIO()
-base_df.to_csv(output, sep='\t', header=False, index=False)
-output.seek(0)
-contents = output.getvalue()
+    conn = psycopg2.connect(
+            host="sbmd.cfv4eklkdk8x.eu-central-1.rds.amazonaws.com", 
+            dbname="sbmd1", port=5432, user="sbmdmaster", password=rdspw)
 
-constring = "postgresql+psycopg2://sbmdmaster:" +rdspw + \
-            "@sbmd.cfv4eklkdk8x.eu-central-1.rds.amazonaws.com:5432/sbmd1"
-engine = create_engine(constring)
-base_df.head(0).to_sql('t_db01_stagings', engine, if_exists='replace', 
-                        index=False)
-cur.copy_from(output, 't_db01_stagings', null="") # null values become ''
-conn.commit()
-conn.close()
+    cur = conn.cursor()
+
+    output = io.StringIO()
+    base_df.to_csv(output, sep='\t', header=False, index=False)
+    output.seek(0)
+    contents = output.getvalue()
+
+    constring = "postgresql+psycopg2://sbmdmaster:" +rdspw + \
+                "@sbmd.cfv4eklkdk8x.eu-central-1.rds.amazonaws.com:5432/sbmd1"
+    engine = create_engine(constring)
+    base_df.head(0).to_sql('t_db01_stagings', engine, if_exists='replace', 
+                            index=False)
+    cur.copy_from(output, 't_db01_stagings', null="") # null values become ''
+    conn.commit()
+    conn.close()
+    
+except Exception:
+    base_df_filename = str(datetime.date.today()) + "_DB_DF.csv"
+    base_df.to_csv(path="/home/ec2-user/sbmd/" + base_df_filename)
+    today = str(datetime.date.today())
+    logging.info(f"DB CSV created for upload from {today}")
 
 #stop in 05 transfer
 
