@@ -67,8 +67,10 @@ response = client.put_object(
         Key=archivfoldername)
 s3res = boto3.resource("s3")
 copy_source = {"Bucket": BUCKET, "Key": s3r_files[0]}
-s3res.Object(BUCKET, archivfoldername).copy_from(copy_source)
-s3res.Object(BUCKET, s3r_files[0]).delete()
+dest = s3res.Object(BUCKET, archivfoldername + copy_source["Key"])
+dest.copy(CopySource=copy_source)
+response = s3res.Object(BUCKET, s3r_files[0]).delete()
+
 df_list = []
 
 for file in s3r_files[1:]:

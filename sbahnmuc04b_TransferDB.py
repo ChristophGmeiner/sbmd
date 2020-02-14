@@ -64,8 +64,9 @@ text = json.loads(result["Body"].read().decode())
 base_df = pd.io.json.json_normalize(text, sep="_")
 
 copy_source = {"Bucket": BUCKET, "Key": s3r_files[0]}
-s3res.Object(BUCKET, archivfoldername).copy_from(copy_source)
-s3res.Object(BUCKET, s3r_files[0]).delete()
+dest = s3res.Object(BUCKET, archivfoldername + copy_source["Key"])
+dest.copy(CopySource=copy_source)
+response = s3res.Object(BUCKET, s3r_files[0]).delete()
 
 FILE_TO_READ = s3r_files[0]
 client = boto3.client('s3')
