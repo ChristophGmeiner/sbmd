@@ -8,7 +8,6 @@ import pytictoc
 import psycopg2
 import io
 from sqlalchemy import create_engine
-import pickle
 import sys
 import datetime
 
@@ -48,18 +47,11 @@ bucket = s3r.Bucket(BUCKET)
 objsr_all = bucket.objects.all()
 client = boto3.client("s3")
 
-i = 0
 s3r_files = []
 for o in objsr_all:
-    i += 1
     s3r_files.append(o.key)
-    
-highest_ind = i
-last_file = s3r_files[-1]
-stamplist = [highest_ind, last_file]
 
-with open("stamplist_file", "wb") as f:
-    pickle.dump(stamplist, f)
+s3r_files = [x for x in s3r_files if x.find("/") == -1]
     
 basefile = s3r_files[0]
 result = client.get_object(Bucket=BUCKET, Key=basefile) 

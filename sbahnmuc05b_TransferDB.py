@@ -5,7 +5,6 @@ import os
 import json
 import pytictoc
 from sqlalchemy import create_engine
-import pickle
 import sys
 import datetime
 
@@ -51,18 +50,11 @@ response = client.put_object(
         Key=archivfoldername)
 s3res = boto3.resource("s3")
 
-i = 0
 s3r_files = []
 for o in objsr_all:
-    i += 1
     s3r_files.append(o.key)
-    
-highest_ind = i
-last_file = s3r_files[-1]
-stamplist = [highest_ind, last_file]
 
-with open("stamplistweather_file", "wb") as f:
-    pickle.dump(stamplist, f)
+s3r_files = [x for x in s3r_files if x.find("/") == -1]
     
 basefile = s3r_files[0]
 result = client.get_object(Bucket=BUCKET, Key=basefile) 
