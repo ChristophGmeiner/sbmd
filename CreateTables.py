@@ -10,6 +10,18 @@ drop_table1 = dropsql + table1
 drop_table2 = dropsql + table2
 drop_table3 = dropsql + table3
 
+create_table1 = createsql + table1 + " (db_id SERIAL PRIMARY KEY, \
+                start_loc VARCHAR NOT NULL, end_loc VARCHAR NOT NULL, \
+                timestamp TIMESTAMP NOT NULL, departure TIME NOT NULL, \
+                arrival TIME NOT NULL, transfers INT, \
+                total_time INTERVAL NOT NULL, products VARCHAR, \
+                price FLOAT, ontime BOOLEAN NOT NULL, \
+                cancelled BOOLEAN NOT NULL, total_delay INT NOT NULL, \
+                delay_departure INT NOT NULL, \
+                delay_arrival INT NOT NULL)"
+create_table1_index = createuniqueindsql + table1 + "_Index ON " + table1 + \
+                      " (timestamp, start_loc, end_loc, departure)"
+
 create_table2 = createsql + table2 + " (gmap_id SERIAL PRIMARY KEY, \
                 start_loc VARCHAR NOT NULL, end_loc VARCHAR NOT NULL, \
                 timestamp TIMESTAMP NOT NULL, start_loc_lat FLOAT, \
@@ -37,7 +49,9 @@ create_table3 = createsql + table3 + " (weather_id SERIAL PRIMARY KEY, \
 create_table3_index = createuniqueindsql + table3 + "_Index ON " + table3 + \
                       " (reception_time, loc_name)"
 
-createtable_queries = [create_table2, create_table2_index, create_table3, create_table3_index]
+createtable_queries = [create_table1, create_table1_index,
+                       create_table2, create_table2_index, 
+                       create_table3, create_table3_index]
 droptable_queries = [drop_table1, drop_table2, drop_table3]
 
 
