@@ -96,10 +96,12 @@ try:
 
 except Exception:
     base_df_filename = str(datetime.date.today()) + "_Weather_DF.csv"
-    base_df.to_csv(path="/home/ec2-user/sbmd/" + base_df_filename)
+    base_df.to_csv("/home/ec2-user/sbmd/" + base_df_filename, index=False)
     today = str(datetime.date.today())
     logging.info(f"Weather CSV created for upload from {today}")
     
+    print(Exception)
+
     client = boto3.client("rds", region_name="eu-central-1")
     response = client.stop_db_instance(DBInstanceIdentifier=rdsid)
 

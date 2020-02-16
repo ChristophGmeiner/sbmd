@@ -110,7 +110,7 @@ try:
     
 except Exception:
     base_df_filename = str(datetime.date.today()) + "_DB_DF.csv"
-    base_df.to_csv(path="/home/ec2-user/sbmd/" + base_df_filename)
+    base_df.to_csv("/home/ec2-user/sbmd/" + base_df_filename, index=False)
     today = str(datetime.date.today())
     logging.info(f"DB CSV created for upload from {today}")
 

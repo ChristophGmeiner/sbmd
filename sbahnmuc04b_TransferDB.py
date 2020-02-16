@@ -47,10 +47,14 @@ for o in objsr_all:
 
 s3r_files = [x for x in s3r_files if x.find("/") == -1]
     
-basefile = s3r_files[0]
-result = client.get_object(Bucket=BUCKET, Key=basefile) 
-text = json.loads(result["Body"].read().decode())
-base_df = pd.io.json.json_normalize(text, sep="_")
+for f in s3r_files:    
+    basefile = f
+    result = client.get_object(Bucket=BUCKET, Key=basefile) 
+    text = json.loads(result["Body"].read().decode())
+    
+    if "timestamp" in text.keys():
+        base_df = pd.io.json.json_normalize(text, sep="_")
+        break
 
 copy_source = {"Bucket": BUCKET, "Key": s3r_files[0]}
 dest = s3res.Object(BUCKET, archivfoldername + copy_source["Key"])
@@ -94,8 +98,9 @@ try:
 
 except Exception:
     base_df_filename = str(datetime.date.today()) + "_Gmap_DF.csv"
-    base_df.to_csv(path="/home/ec2-user/sbmd/" + base_df_filename)
+    base_df.to_csv("/home/ec2-user/sbmd/" + base_df_filename, index=False)
     today = str(datetime.date.today())
+    print(Exception)
     logging.info(f"Gmap CSV created for upload from {today}")
 
 #stop in 05 transfer
