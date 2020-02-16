@@ -18,9 +18,9 @@ create_table1 = createsql + table1 + " (db_id SERIAL PRIMARY KEY, \
                 price FLOAT, ontime BOOLEAN NOT NULL, \
                 cancelled BOOLEAN NOT NULL, total_delay INT NOT NULL, \
                 delay_departure INT NOT NULL, \
-                delay_arrival INT NOT NULL)"
+                delay_arrival INT NOT NULL, dep_date DATE)"
 create_table1_index = createuniqueindsql + table1 + "_Index ON " + table1 + \
-                      " (timestamp, start_loc, end_loc, departure)"
+                      " (dep_date, departure, start_loc, end_loc)"
 
 create_table2 = createsql + table2 + " (gmap_id SERIAL PRIMARY KEY, \
                 start_loc VARCHAR NOT NULL, end_loc VARCHAR NOT NULL, \
