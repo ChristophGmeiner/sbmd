@@ -93,6 +93,11 @@ try:
     constring = "postgresql+psycopg2://sbmdmaster:" +rdspw + \
                 "@sbmd.cfv4eklkdk8x.eu-central-1.rds.amazonaws.com:5432/sbmd1"
     engine = create_engine(constring)
+
+    coln = list(base_df.columns)
+    coln = [x.lower() for x in coln]
+    base_df.columns = coln
+
     base_df.to_sql('t_gmap01_stagings', engine, if_exists='replace', 
                             index=False)
 

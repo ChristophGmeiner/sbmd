@@ -104,6 +104,11 @@ try:
     engine = create_engine(constring)
     base_df.head(0).to_sql('t_db01_stagings', engine, if_exists='replace', 
                             index=False)
+
+    coln = list(base_df.columns)
+    coln = [x.lower() for x in coln]
+    base_df.columns = coln
+
     cur.copy_from(output, 't_db01_stagings', null="") # null values become ''
     conn.commit()
     conn.close()
