@@ -7,3 +7,4 @@ owm.txt
 *.ipynb
 stamp*
 *.csv
+*__pycache__*
