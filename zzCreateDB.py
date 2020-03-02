@@ -31,15 +31,18 @@ existing_snapshots = client.describe_db_snapshots(
         DBInstanceIdentifier=rdsid)
 esn_list = existing_snapshots["DBSnapshots"]
 
-final_esn_list = [utc.localize(datetime.utcnow() - timedelta(weeks=1000))]
+final_esn_list = list()
+final_esn_list.append("test")
+final_esn_list.append(utc.localize(datetime.utcnow() - timedelta(weeks=1000)))
 for s in esn_list:
     sn_name = s["DBSnapshotIdentifier"]
     sn_time = s["SnapshotCreateTime"]
-    
-    if final_esn_list:
-        if sn_name.find(snn_base) > -1 and sn_time > final_esn_list[0]:
-            final_esn_list.pop()
-            final_esn_list.append(sn_name)
+
+    if sn_name.find(snn_base) > -1 and sn_time > final_esn_list[1]:
+        final_esn_list.pop()
+        final_esn_list.pop()
+        final_esn_list.append(sn_name)
+        final_esn_list.append(sn_time)
 
 response = client.restore_db_instance_from_db_snapshot(
         DBInstanceIdentifier=rdsid,
