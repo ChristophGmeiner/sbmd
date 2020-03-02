@@ -5,20 +5,19 @@ from airflow.operators import BashOperator
 
 default_args = {
         "owner": "Christoph Gmeiner",
-        "start_date": datetime.now(),
-        "catchup": False,
+        "start_date": datetime(2020, 2, 23),
+        #"catchup": False,
         "retries": 1,
-        "retry_delay": timedelta(seconds=60),
+        "retry_delay": timedelta(seconds=120),
         "email": "christoph.gmeiner@gmail.com",
         "email_on_retry": False,
-        "depends_on_past": False,
-        "trigger_rule": TriggerRule.ALL_DONE
+        "depends_on_past": True
         }
 
 dag = DAG("sbmd02rawdatatoDB",
           description="Creates DBs and loads raw data from S3 to Postgres DB",
           default_args=default_args,
-          schedule_interval="* * * * 1")
+          schedule_interval="40 7 * * 0")
 
 create_DB_task = BashOperator(
         task_id="01_create_DB_task",
@@ -48,11 +47,13 @@ load_weather_data = BashOperator(
 insert_live_data = BashOperator(
         task_id="04_load_liveDB_data",
         bash_command="python3 /home/ec2-user/sbmd/zz09_InsertLiveTables.py",
+        trigger_rule=TriggerRule.ALL_DONE,
         dag=dag)
 
 archive_del_db = BashOperator(
         task_id="05b_Archive_and_Delete_DB",
         bash_command="python3 /home/ec2-user/sbmd/zzDelDB.py",
+        trigger_rule=TriggerRule.ALL_DONE,
         dag=dag)
 
 create_DB_task >> create_tables_task
