@@ -15,7 +15,7 @@ default_args = {
         "trigger_rule": TriggerRule.ALL_DONE
         }
 
-dag = DAG("sbmd02_raw data_to_DB",
+dag = DAG("sbmd02rawdatatoDB",
           description="Creates DBs and loads raw data from S3 to Postgres DB",
           default_args=default_args,
           schedule_interval="* * * * 1")
