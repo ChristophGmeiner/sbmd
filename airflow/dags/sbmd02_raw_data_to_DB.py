@@ -17,7 +17,7 @@ default_args = {
 
 dag = DAG("sbmd02_raw data_to_DB",
           description="Creates DBs and loads raw data from S3 to Postgres DB",
-          args=default_args,
+          default_args=default_args,
           schedule_interval="* * * * 1")
 
 create_DB_task = BashOperator(
