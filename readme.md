@@ -55,6 +55,10 @@ This process is about aggregating and transforming the json data from the step b
 In a first step the database gets created from a snapshot. For the initial load the live tables will be created. 
 After that - using the first three scripts below - the data is transformed to a dataframa, bulk copied to a postgres staging table, inserted into the respective live tables and finally all transferred json files are archived into a newly created folder in the respective S3 bucket.
 
+After this has finished, the database will be saved in a snapshot and deleted again, due to cost reasons.
+
+This process is carried out once a week and triggered via crontab on the same EC2 as for the data gathering process.
+
 This process of couse could also be carried out with Apache Airflow. Since the EC2 I rented was to weak for managing many parallel processes, this was not set productive.
 Nevertheless I created a dag here for demonstration purposes, but due to cost restrictions it never went productive.
 
@@ -70,15 +74,25 @@ The three files below transfer the transformed json data to postgres staging tab
 #### sbahnmuc04b_TransferDB.py
 #### sbahnmuc05b_TransferDB.py
 #### zz07_Transfer_DB_Data.sh
-
 This summarizes the three scripts abover in a shell script.
-
-#### zz09_InsertLiveTables.py
-
-This transfer4s data in postgres from staging to love tables.
 
 #### airflow folder
 This folder contains all necessary files for the Airflow dag.
+
+#### CreateTables.py, zz08_CreateEmptyDBTables.py
+Python script for creatin live and staging tables during initial database creation.
+
+#### DeArchive.py
+Python script for undoing a specific loading process in the respective S3 bucket.
+
+#### InsertTables.py, zz09_InsertLiveTables.py
+Loads data from the staging tables into the live tables. In a first step here, the keys, which are stored in the staging tables are deleted from the live tables (just in case to avoid errors). After that the inserts are carried out.
+
+#### zzCreateDB.py
+Creates a AWS RDS postgres database from a snapshot. During the script the latest snapshot gets defined.
+
+#### zzDelDB.py
+Deletes the database after loading process has finished and creates a final snapshot with a specified name, so that during creation process the latest snapshot can be found and re-created.
 
 
 ## Data Modelling 
@@ -90,7 +104,10 @@ This folder contains all necessary files for the Airflow dag.
 
 All confidential AWS data is stored in a local config file and loaded to the cripts via configparser.
 
-
-
 ### zz01_startVM1.py, zz02_StopVM1.py, zz01b_bash.sh, zz02b_bash.sh
 This scripts start or stop the productive VM
+
+### zz04_rm_json.sh
+Script used for deleting old json files, which are temporarily stored on disc of the EC2 during the data gathering process.
+
+
