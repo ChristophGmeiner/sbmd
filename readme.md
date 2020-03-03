@@ -29,6 +29,9 @@ This process involves mainly web scrapping via the mentioned above APIs and stor
 
 This process of couse could also be carried out with Apache Airflow. Since the EC2 I rented was to weak for managing many parallel processes, this was not set productive.
 
+I chose S3 and the json format, since it is the most natural way to store this data (since the API request result in single a single json file per record). In this way the raw data can be stored flexible and marked accordingly when loaded to the database. Therfore I have perfect control, what data was already loaded, what was not yet loaded and when what was loaded.
+Also concerning costs it is - according to my current knowledge - the most sufficient way for this process.
+
 ### Relevant files
 
 All confidential data is stored in a local config file and loaded to the cripts via configparser.
@@ -55,6 +58,9 @@ After that - using the first three scripts below - the data is transformed to a 
 This process of couse could also be carried out with Apache Airflow. Since the EC2 I rented was to weak for managing many parallel processes, this was not set productive.
 Nevertheless I created a dag here for demonstration purposes, but due to cost restrictions it never went productive.
 
+I chose postgres here, since the data should be stored in a relational way. Since the data is currently not that big and proper indexed AWS Redshift or another MPP database is not necessary.
+Of course,m when the datra should be scaled - e.g. to all areas in Germany - postgres would not be sufficient anymore. Than maybe Appache Cassandra or a direct transfer to AWS redshift should be preferred.
+
 ### Relevant files
 
 All confidential data is stored in a local config file and loaded to the cripts via configparser.
@@ -76,6 +82,8 @@ This folder contains all necessary files for the Airflow dag.
 
 
 ## Data Modelling 
+
+## Tables in Postgres Database
 
 
 ## Other Files
