@@ -36,16 +36,22 @@ bucket = s3r.Bucket(BUCKET)
 objsr_all = bucket.objects.all()
 client = boto3.client("s3")
 
+logging.info("Starting gather S3 files...")
+
 s3r_files = []
 for o in objsr_all:
     s3r_files.append(o.key)
 
 s3r_files = [x for x in s3r_files if x.find("/") == -1]
-    
+
+logging.info("Finished gathering S3 files.")
+
 basefile = s3r_files[0]
 result = client.get_object(Bucket=BUCKET, Key=basefile) 
 text = json.loads(result["Body"].read().decode())
 base_df = pd.io.json.json_normalize(text, sep="_")
+
+logging.info("Finished DF")
 
 FILE_TO_READ = s3r_files[0]
 client = boto3.client('s3')
@@ -60,6 +66,8 @@ dest = s3res.Object(BUCKET, archivfoldername + copy_source["Key"])
 dest.copy(CopySource=copy_source)
 response = s3res.Object(BUCKET, s3r_files[0]).delete()
 
+logging.info("Finished first line")
+
 df_list = []
 
 for file in s3r_files[1:]:
@@ -73,6 +81,8 @@ for file in s3r_files[1:]:
     dest = s3res.Object(BUCKET, archivfoldername + copy_source["Key"])
     dest.copy(CopySource=copy_source)
     response = s3res.Object(BUCKET, file).delete()
+
+logging.info("Finished whole DF and file")
 
 try: 
 
@@ -112,12 +122,15 @@ try:
     cur.copy_from(output, 't_db01_stagings', null="") # null values become ''
     conn.commit()
     conn.close()
+
+    logging.info("Finished Copy")
     
 except Exception:
     base_df_filename = str(datetime.date.today()) + "_DB_DF.csv"
     base_df.to_csv("/home/ec2-user/sbmd/" + base_df_filename, index=False)
     today = str(datetime.date.today())
     logging.info(f"DB CSV created for upload from {today}")
+    logging.eeror("Copy failed!")
 
 #stop in 05 transfer
 
