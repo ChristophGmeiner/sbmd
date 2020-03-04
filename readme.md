@@ -1,4 +1,4 @@
-# Gathering and Analyzong Traffic and Delay Data for the Greater Munich Area
+# Gathering and Analyzing Traffic and Delay Data for the Greater Munich Area
 
 This git repo shows a way on how to gather structured and long-term traffic analytical information of the Greater Munich area. This contains data about many train and car connections and weather data.
 This is also my Capstone project for my Udacity Nanodegree in Data Engineering.
@@ -66,6 +66,7 @@ I chose postgres here, since the data should be stored in a relational way. Sinc
 Of course,m when the datra should be scaled - e.g. to all areas in Germany - postgres would not be sufficient anymore. Than maybe Appache Cassandra or a direct transfer to AWS redshift should be preferred.
 
 ### Data sources
+All nested arrays in the json files below, will be spread across separate columns during the DB load process in the "b" scripts below.
 
 #### Deutsche Bahn API
 This is live data about all Deutsche Bahn trains. For details on the API, please see the mentioned above schiene module documentation.
@@ -119,6 +120,16 @@ See an example of the json file below:
 - stat2: Eneterd end location
 
 #### Weather data
+The weather data is gathered per hour for each locattion, which is relevant for the other two data gathering processes above. It is carried out with the pyowm module and the 05 scripts below. Please see the link above for more details on that. See an example json below:
+
+```
+{"reception_time": 1580671512, "Location": {"name": "Altomunster", "coordinates": {"lon": 11.26, "lat": 48.39}, "ID": 2956951, "country": "DE"}, "Weather": {"reference_time": 1580671512, "sunset_time": 1580660021, "sunrise_time": 1580625804, "clouds": 40, "rain": {}, "snow": {}, "wind": {"speed": 5.7, "deg": 230}, "humidity": 93, "pressure": {"press": 1013, "sea_level": null}, "temperature": {"temp": 284.54, "temp_kf": null, "temp_max": 285.37, "temp_min": 283.71}, "status": "Clouds", "detailed_status": "scattered clouds", "weather_code": 802, "weather_icon_name": "03n", "visibility_distance": 10000, "dewpoint": null, "humidex": null, "heat_index": null}}
+```
+
+##### Fields
+- reception_time: timestamp of request
+- Location: details about the location
+- Weather: This nested array, contains all kind of weather information.
 
 ### Relevant files
 All confidential data is stored in a local config file and loaded to the scripts via configparser.
