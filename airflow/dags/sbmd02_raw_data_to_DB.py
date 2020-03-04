@@ -7,10 +7,11 @@ default_args = {
         "owner": "Christoph Gmeiner",
         "start_date": datetime(2020, 2, 23),
         #"catchup": False,
-        "retries": 1,
+        "retries": 2,
         "retry_delay": timedelta(seconds=120),
         "email": "christoph.gmeiner@gmail.com",
         "email_on_retry": False,
+        "email_on_success": True,
         "depends_on_past": True
         }
 
@@ -24,10 +25,10 @@ create_DB_task = BashOperator(
         bash_command=" python3 /home/ec2-user/sbmd/zzCreateDB.py",
         dag=dag)
 
-create_tables_task = BashOperator(
-        task_id="02_Create_Stage_Tables",
-        bash_command="python3 /home/ec2-user/sbmd/zz08_CreateEmptyDBTables.py",
-        dag=dag)
+#create_tables_task = BashOperator(
+#        task_id="02_Create_Stage_Tables",
+#        bash_command="python3 /home/ec2-user/sbmd/zz08_CreateEmptyDBTables.py",
+#        dag=dag)
 
 load_train_data = BashOperator(
         task_id="03a_Load_train_Data",
@@ -56,10 +57,10 @@ archive_del_db = BashOperator(
         trigger_rule=TriggerRule.ALL_DONE,
         dag=dag)
 
-create_DB_task >> create_tables_task
-create_tables_task >> load_train_data
-create_tables_task >> load_gmap_data
-create_tables_task >> load_weather_data
+#create_DB_task >> create_tables_task
+create_DB_task >> load_train_data
+create_DB_task >> load_gmap_data
+create_DB_task >> load_weather_data
 
 load_train_data >> insert_live_data
 load_gmap_data >> insert_live_data
