@@ -130,7 +130,7 @@ except Exception:
     base_df.to_csv("/home/ec2-user/sbmd/" + base_df_filename, index=False)
     today = str(datetime.date.today())
     logging.info(f"DB CSV created for upload from {today}")
-    logging.eeror("Copy failed!")
+    logging.error("Copy failed!")
 
 #stop in 05 transfer
 
