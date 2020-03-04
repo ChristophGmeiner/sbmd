@@ -39,11 +39,15 @@ response = client.put_object(
         Key=archivfoldername)
 s3res = boto3.resource("s3")
 
+logging.info("Starting gather S3 files...")
+
 s3r_files = []
 for o in objsr_all:
     s3r_files.append(o.key)
 
 s3r_files = [x for x in s3r_files if x.find("/") == -1]
+
+logging.info("Finished gathering S3 files.")
     
 basefile = s3r_files[0]
 result = client.get_object(Bucket=BUCKET, Key=basefile) 
@@ -70,6 +74,8 @@ for file in s3r_files[1:]:
     dest = s3res.Object(BUCKET, archivfoldername + copy_source["Key"])
     dest.copy(CopySource=copy_source)
     response = s3res.Object(BUCKET, file).delete()
+    
+logging.info("Finished DF")
 
 try:
     
@@ -96,18 +102,21 @@ try:
     base_df.to_sql('t_w01_stagings', engine, if_exists='replace', 
                             index=False)
 
-    client = boto3.client("rds", region_name="eu-central-1")
-    response = client.stop_db_instance(DBInstanceIdentifier=rdsid)
+    #client = boto3.client("rds", region_name="eu-central-1")
+    #response = client.stop_db_instance(DBInstanceIdentifier=rdsid)
+    
+    logging.info("Finished Copy")
 
-except Exception:
+except Exception as e:
     base_df_filename = str(datetime.date.today()) + "_Weather_DF.csv"
     base_df.to_csv("/home/ec2-user/sbmd/" + base_df_filename, index=False)
     today = str(datetime.date.today())
     logging.info(f"Weather CSV created for upload from {today}")
-    
-    print(Exception)
+    logging.error("Copy failed!")
+    logging.error(e)
 
-    client = boto3.client("rds", region_name="eu-central-1")
-    response = client.stop_db_instance(DBInstanceIdentifier=rdsid)
+
+    #client = boto3.client("rds", region_name="eu-central-1")
+    #response = client.stop_db_instance(DBInstanceIdentifier=rdsid)
 
 t.toc()

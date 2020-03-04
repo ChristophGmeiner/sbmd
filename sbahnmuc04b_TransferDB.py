@@ -41,6 +41,8 @@ s3res = boto3.resource("s3")
 
 df_list = []
 
+logging.info("Starting gather S3 files...")
+
 s3r_files = []
 for o in objsr_all:
     s3r_files.append(o.key)
@@ -55,6 +57,8 @@ for f in s3r_files:
     if "timestamp" in text.keys():
         base_df = pd.io.json.json_normalize(text, sep="_")
         break
+    
+logging.info("Finished gathering S3 files.")
 
 copy_source = {"Bucket": BUCKET, "Key": s3r_files[0]}
 dest = s3res.Object(BUCKET, archivfoldername + copy_source["Key"])
@@ -75,6 +79,8 @@ for file in s3r_files[1:]:
     dest = s3res.Object(BUCKET, archivfoldername + copy_source["Key"])
     dest.copy(CopySource=copy_source)
     response = s3res.Object(BUCKET, file).delete()
+    
+logging.info("Finished DF")
 
 try:
 
@@ -100,13 +106,17 @@ try:
 
     base_df.to_sql('t_gmap01_stagings', engine, if_exists='replace', 
                             index=False)
+    
+    logging.info("Finished Copy")
 
-except Exception:
+except Exception as e:
     base_df_filename = str(datetime.date.today()) + "_Gmap_DF.csv"
     base_df.to_csv("/home/ec2-user/sbmd/" + base_df_filename, index=False)
     today = str(datetime.date.today())
     print(Exception)
     logging.info(f"Gmap CSV created for upload from {today}")
+    logging.error("Copy failed!")
+    logging.error(e)
 
 #stop in 05 transfer
 
