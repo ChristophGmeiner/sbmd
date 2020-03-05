@@ -5,20 +5,20 @@ from airflow.operators.sensors import TimeDeltaSensor
 
 default_args = {
         "owner": "Christoph Gmeiner",
-        "start_date": datetime(2020, 2, 23),
-        "retries": 2,
-        "retry_delay": timedelta(seconds=300),
+        "start_date": datetime(2020, 3, 4, 22, 0),
+        "retries": 1,
+        "retry_delay": timedelta(seconds=60),
         "email": "christoph.gmeiner@gmail.com",
         "email_on_retry": True,
         "email_on_success": True,
         "depends_on_past": True,
-        "triiger_rle": "all_done"
+        "trigger_rule": "all_done"
         }
 
 dag = DAG("sbmd01_web_data_gathering",
           description="Gathers all necessary web data",
-          args=default_args,
-          scheduleinterval="0 * * * *",
+          default_args=default_args,
+          schedule_interval="0 * * * *",
           max_active_runs=1)
 
 create_stations_task = BashOperator(
