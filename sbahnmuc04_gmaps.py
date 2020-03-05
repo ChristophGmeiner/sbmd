@@ -8,6 +8,11 @@ from itertools import combinations
 import pytictoc
 import multiprocessing as mp
 import logging
+    
+logpath = "/home/ubuntu/sbmd/logs/"
+normlogfilename = "sb04log_" \
+              + datetime.now().strftime("%Y-%m-%d_%H-%M") + ".log"
+logging.basicConfig(filename=logpath+normlogfilename, level=logging.DEBUG)
 
 def gmap_query(start, end, s3key, s3skey, api_key):
     '''
@@ -80,11 +85,6 @@ def gmap_query_all(c, s3key_p, s3skey_p, api_key_p):
         logging.error(e)
         
 def main():
-    
-    logpath = "/home/ubuntu/sbmd/logs/"
-    normlogfilename = "sb04log_" \
-                  + datetime.now().strftime("%Y-%m-%d_%H-%M") + ".log"
-    logging.basicConfig(filename=logpath+normlogfilename, level=logging.DEBUG)
 
     t = pytictoc.TicToc()
     
@@ -117,11 +117,6 @@ def main():
     t.toc()
     
 if __name__ == "__main__":
-    try: 
-        main()
-        logging.info("Gmap Data loaded succesfull!")
-        
-    except Exception as e:
-        logging.error(e)
-        curtime = str(datetime.now())
-        logging.error(f"Gmap Gaterhing failed on {curtime}")
+  
+    main()
+    logging.info("Gmap Data loaded succesfull!")

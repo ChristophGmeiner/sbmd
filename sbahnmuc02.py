@@ -10,6 +10,11 @@ import numpy as np
 import logging
 import datetime
 
+logpath = "/home/ubuntu/sbmd/logs/"
+normlogfilename = "sb02log_" \
+              + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M") + ".log"
+logging.basicConfig(filename=logpath+normlogfilename, level=logging.DEBUG)
+
 def all_station(p, s_object=schiene.Schiene()):
     '''
     creates a list object containing all stations gathered from p
@@ -28,11 +33,6 @@ def all_station(p, s_object=schiene.Schiene()):
     
 def main():
     
-    logpath = "/home/ubuntu/sbmd/logs/"
-    normlogfilename = "sb02log_" \
-                  + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M") + ".log"
-    logging.basicConfig(filename=logpath+normlogfilename, level=logging.DEBUG)
-
     pool = mp.Pool(mp.cpu_count())
     
     t = pytictoc.TicToc()
@@ -118,10 +118,4 @@ def main():
     logging.info(t.toc())
     
 if __name__ == "__main__":
-    try:
-        main()
-    
-    except Exception as e:
-        curtime = str(datetime.datetime.now())
-        logging.error(e)
-        logging.error(f"Station gathering failed at {curtime}")
+    main()
