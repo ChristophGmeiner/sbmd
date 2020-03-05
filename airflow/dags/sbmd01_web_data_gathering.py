@@ -135,11 +135,6 @@ t9 = PythonOperator(
     python_callable=wait,
     dag=dag)
 
-rm_json_task = BashOperator(
-        task_id="06_Remove_local_jsons",
-        bash_command="./home/ubuntu/zz04_rm_json.sh",
-        dag=dag)
-
 create_stations_task >> conn_task_1
 create_stations_task >> t1
 
@@ -171,4 +166,3 @@ t9 >> conn_task_10
 t9 >> gmap_task
 
 gmap_task >> weather_task
-weather_task >> rm_json_task
