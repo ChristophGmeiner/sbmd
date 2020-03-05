@@ -82,7 +82,7 @@ def gmap_query_all(c, s3key_p, s3skey_p, api_key_p):
 def main():
     
     logpath = "/home/ubuntu/sbmd/logs/"
-    normlogfilename = "sb04log _" \
+    normlogfilename = "sb04log_" \
                   + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M") + ".log"
     logging.basicConfig(filename=logpath+normlogfilename, level=logging.DEBUG)
 

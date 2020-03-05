@@ -43,7 +43,7 @@ def main():
 
                 
     logpath = "/home/ubuntu/sbmd/logs/"
-    normlogfilename = "sb05log _" \
+    normlogfilename = "sb05log_" \
           + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M") + ".log"
     logging.basicConfig(filename=logpath+normlogfilename, level=logging.DEBUG)
     

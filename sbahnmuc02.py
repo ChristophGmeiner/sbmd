@@ -29,7 +29,7 @@ def all_station(p, s_object=schiene.Schiene()):
 def main():
     
     logpath = "/home/ubuntu/sbmd/logs/"
-    normlogfilename = "sb02log _" \
+    normlogfilename = "sb02log_" \
                   + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M") + ".log"
     logging.basicConfig(filename=logpath+normlogfilename, level=logging.DEBUG)
 

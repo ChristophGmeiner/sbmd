@@ -12,7 +12,7 @@ t = pytictoc.TicToc()
 t.tic()
 
 logpath = "/home/ubuntu/sbmd/logs/"
-normlogfilename = "sb05blog _" \
+normlogfilename = "sb05blog_" \
       + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M") + ".log"
 logging.basicConfig(filename=logpath+normlogfilename, level=logging.DEBUG)
         

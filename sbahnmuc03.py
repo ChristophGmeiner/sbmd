@@ -77,7 +77,7 @@ def load_trains_all(conns, s3key_p, s3skey_p):
 def main():
     
     logpath = "/home/ubuntu/sbmd/logs/"
-    normlogfilename = "sb03log _" + sys.argv[1] + "_" \
+    normlogfilename = "sb03log_" + sys.argv[1] + "_" \
                   + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M") + ".log"
     logging.basicConfig(filename=logpath+normlogfilename, level=logging.DEBUG)
 
@@ -101,6 +101,9 @@ def main():
     pool = mp.Pool(mp.cpu_count())
     
     [pool.apply(load_trains_all, args=(co, s3k, s3ks)) for co in statit]
+    
+    ind = sys.argv[1]
+    logging.info(f"Gathered conn data succesfully with index {ind}")
             
     t.toc()
     
