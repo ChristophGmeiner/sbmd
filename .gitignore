@@ -8,3 +8,4 @@ owm.txt
 stamp*
 *.csv
 *__pycache__*
+.DS_Store
