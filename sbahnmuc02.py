@@ -27,6 +27,11 @@ def all_station(p, s_object=schiene.Schiene()):
     return(pre_list)   
     
 def main():
+    
+    logpath = "/home/ubuntu/sbmd/logs/"
+    normlogfilename = "sb02log _" \
+                  + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M") + ".log"
+    logging.basicConfig(filename=logpath+normlogfilename, level=logging.DEBUG)
 
     pool = mp.Pool(mp.cpu_count())
     

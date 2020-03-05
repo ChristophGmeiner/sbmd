@@ -10,8 +10,6 @@ def load_weather(c, s3key, s3skey,
                  owmfile = "/home/ubuntu/sbmd/owm.txt"):
     
         try:
-            
-            
             with open(owmfile, "r") as f:
                 owmapi = f.readline()
 
@@ -36,13 +34,19 @@ def load_weather(c, s3key, s3skey,
             bucket = s3.Bucket("sbmd3weather2")
                 
             bucket.upload_file(filename, filename)
-            s
+            
         except Exception as e:
             logging.error(c)
             logging.error(e)
 
 def main():
 
+                
+    logpath = "/home/ubuntu/sbmd/logs/"
+    normlogfilename = "sb05log _" \
+          + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M") + ".log"
+    logging.basicConfig(filename=logpath+normlogfilename, level=logging.DEBUG)
+    
     pool = mp.Pool(mp.cpu_count())
     
     t = TicToc()
