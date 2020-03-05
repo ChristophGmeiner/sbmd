@@ -7,6 +7,7 @@ import json
 from itertools import combinations
 import pytictoc
 import multiprocessing as mp
+import logging
 
 def gmap_query(start, end, s3key, s3skey, api_key):
     '''
@@ -67,16 +68,16 @@ def gmap_query_all(c, s3key_p, s3skey_p, api_key_p):
        gmap_query(c[0], c[1], s3key_p, s3skey_p, api_key_p)
         
     except Exception as e:
-        print("Error at first round for " + c)
-        print(e)
+        logging.error("Error at first round for " + c)
+        logging.error(e)
         
     try:
         
        gmap_query(c[1], c[0], s3key_p, s3skey_p, api_key_p)
         
     except Exception as e:
-        print("Error at second round for " + c)
-        print(e)
+        logging.error("Error at second round for " + c)
+        logging.error(e)
         
 def main():
 
@@ -90,12 +91,12 @@ def main():
 
     statconns = combinations(maps_stats, 2)
     
-    keyfile = "/home/ec2-user/sbmd/gapi.txt"
+    keyfile = "/home/ubuntu/sbmd/gapi.txt"
     with open(keyfile) as f:
         ak= f.readline()
         f.close
     
-    credfile="/home/ec2-user/sbmd/dwh.cfg"
+    credfile="/home/ubuntu/sbmd/dwh.cfg"
     config = configparser.ConfigParser()
     config.read(credfile)
 
@@ -111,4 +112,11 @@ def main():
     t.toc()
     
 if __name__ == "__main__":
-    main()
+    try: 
+        main()
+        logging.info("Gmap Data loaded succesfull!")
+        
+    except Exception as e:
+        logging.error(e)
+        curtime = str(datetime.now())
+        logging.error(f"Gmap Gaterhing failed on {curtime}")

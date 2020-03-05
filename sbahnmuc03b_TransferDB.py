@@ -22,7 +22,7 @@ class Printer():
         sys.stdout.flush()
         
 config = configparser.ConfigParser()
-config.read("/home/ec2-user/sbmd/dwh.cfg")
+config.read("/home/ubuntu/sbmd/dwh.cfg")
 
 rdsid = config['RDS']['ID1']
 rdspw = config["RDS"]["PW"]
@@ -85,19 +85,6 @@ for file in s3r_files[1:]:
 logging.info("Finished whole DF and file")
 
 try: 
-
-    client = boto3.client("rds", region_name="eu-central-1")
-    dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
-    dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
-    
-    if dbstate != 'available':
-        response = client.start_db_instance(DBInstanceIdentifier=rdsid)
-
-        while dbstate != "available":
-            dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
-            dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
-            Printer(dbstate)
-
     conn = psycopg2.connect(
             host="sbmd.cfv4eklkdk8x.eu-central-1.rds.amazonaws.com", 
             dbname="sbmd1", port=5432, user="sbmdmaster", password=rdspw)
@@ -123,14 +110,23 @@ try:
     conn.commit()
     conn.close()
 
-    logging.info("Finished Copy")
+    logging.info("Finished Copy, starting data quality checks")
+    
+    if (len(s3r_files) != base_df.shape[0]):
+        logging.error("Data Quality check failed! Files and DF length not \
+                      identical!")
+        
+        base_df_filename = str(datetime.date.today()) + "_DB_DF.csv"
+        base_df.to_csv("/home/ubuntu/sbmd/" + base_df_filename, index=False)
+        today = str(datetime.date.today())
+        logging.info(f"DB CSV created for upload from {today}")
+        logging.error("Copy failed!")        
     
 except Exception as e:
     base_df_filename = str(datetime.date.today()) + "_DB_DF.csv"
-    base_df.to_csv("/home/ec2-user/sbmd/" + base_df_filename, index=False)
+    base_df.to_csv("/home/ubuntu/sbmd/" + base_df_filename, index=False)
     today = str(datetime.date.today())
     logging.info(f"DB CSV created for upload from {today}")
-    logging.error("Copy failed!")
     logging.error("Copy failed!")
     logging.error(e)
 

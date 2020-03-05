@@ -19,7 +19,7 @@ class Printer():
         sys.stdout.flush()
         
 config = configparser.ConfigParser()
-config.read("/home/ec2-user/sbmd/dwh.cfg")
+config.read("/home/ubuntu/sbmd/dwh.cfg")
 
 rdsid = config['RDS']['ID1']
 rdspw = config["RDS"]["PW"]
@@ -83,19 +83,6 @@ for file in s3r_files[1:]:
 logging.info("Finished DF")
 
 try:
-
-    client = boto3.client("rds", region_name="eu-central-1")
-    dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
-    dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
-
-    if dbstate != 'available':
-        response = client.start_db_instance(DBInstanceIdentifier=rdsid)
-
-        while dbstate != "available":
-            dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
-            dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
-            Printer(dbstate)
-
     constring = "postgresql+psycopg2://sbmdmaster:" +rdspw + \
                 "@sbmd.cfv4eklkdk8x.eu-central-1.rds.amazonaws.com:5432/sbmd1"
     engine = create_engine(constring)
@@ -111,9 +98,9 @@ try:
 
 except Exception as e:
     base_df_filename = str(datetime.date.today()) + "_Gmap_DF.csv"
-    base_df.to_csv("/home/ec2-user/sbmd/" + base_df_filename, index=False)
+    base_df.to_csv("/home/uubuntu/sbmd/" + base_df_filename, index=False)
     today = str(datetime.date.today())
-    print(Exception)
+    
     logging.info(f"Gmap CSV created for upload from {today}")
     logging.error("Copy failed!")
     logging.error(e)

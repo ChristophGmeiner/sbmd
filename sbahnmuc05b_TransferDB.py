@@ -11,15 +11,9 @@ import logging
 
 t = pytictoc.TicToc()
 t.tic()
-
-class Printer():
-    """Print things to stdout on one line dynamically"""
-    def __init__(self,data):
-        sys.stdout.write("\r\x1b[K"+data.__str__())
-        sys.stdout.flush()
         
 config = configparser.ConfigParser()
-config.read("/home/ec2-user/sbmd/dwh.cfg")
+config.read("/home/ubuntu/sbmd/dwh.cfg")
 
 rdsid = config['RDS']['ID1']
 rdspw = config["RDS"]["PW"]
@@ -78,19 +72,6 @@ for file in s3r_files[1:]:
 logging.info("Finished DF")
 
 try:
-    
-    client = boto3.client("rds", region_name="eu-central-1")
-    dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
-    dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
-
-    if dbstate != 'available':
-        response = client.start_db_instance(DBInstanceIdentifier=rdsid)
-
-        while dbstate != "available":
-            dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
-            dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
-            Printer(dbstate)
-
     constring = "postgresql+psycopg2://sbmdmaster:" +rdspw + \
                 "@sbmd.cfv4eklkdk8x.eu-central-1.rds.amazonaws.com:5432/sbmd1"
     engine = create_engine(constring)
@@ -101,22 +82,15 @@ try:
 
     base_df.to_sql('t_w01_stagings', engine, if_exists='replace', 
                             index=False)
-
-    #client = boto3.client("rds", region_name="eu-central-1")
-    #response = client.stop_db_instance(DBInstanceIdentifier=rdsid)
     
     logging.info("Finished Copy")
 
 except Exception as e:
     base_df_filename = str(datetime.date.today()) + "_Weather_DF.csv"
-    base_df.to_csv("/home/ec2-user/sbmd/" + base_df_filename, index=False)
+    base_df.to_csv("/home/ubuntu/sbmd/" + base_df_filename, index=False)
     today = str(datetime.date.today())
     logging.info(f"Weather CSV created for upload from {today}")
     logging.error("Copy failed!")
     logging.error(e)
-
-
-    #client = boto3.client("rds", region_name="eu-central-1")
-    #response = client.stop_db_instance(DBInstanceIdentifier=rdsid)
 
 t.toc()

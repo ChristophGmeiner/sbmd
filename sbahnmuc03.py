@@ -8,6 +8,7 @@ import boto3
 import pickle
 from pytictoc import TicToc
 import multiprocessing as mp
+import logging
 
 def load_train(start, end, s3key, s3skey, 
                s = schiene.Schiene()):
@@ -62,16 +63,16 @@ def load_trains_all(conns, s3key_p, s3skey_p):
         load_train(conns[0], conns[1], s3key_p, s3skey_p)
     
     except Exception as e:
-        print("Error at first round for " + conns[0] + "_" + conns[1])
-        print(e)
+        logging.error("Error at first round for " + conns[0] + "_" + conns[1])
+        logging.error(e)
         
         
     try:
         load_train(conns[1], conns[0], s3key_p, s3skey_p)
     
     except Exception as e:
-        print("Error at second round for " + conns[0] + "_" + conns[1])
-        print(e)
+        logging.error("Error at second round for " + conns[0] + "_" + conns[1])
+        logging.error(e)
         
 def main():
 
@@ -79,12 +80,12 @@ def main():
 
     t.tic()
 
-    with open("/home/ec2-user/sbmd/station", "rb") as f:
+    with open("/home/ubuntu/sbmd/station", "rb") as f:
         fileobj = pickle.load(f) 
 	
     statit = fileobj[2][int(sys.argv[1])]
 
-    credfile = "/home/ec2-user/sbmd/dwh.cfg"
+    credfile = "/home/ubuntu/sbmd/dwh.cfg"
 
     config = configparser.ConfigParser()
     config.read(credfile)
@@ -99,4 +100,10 @@ def main():
     t.toc()
     
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    
+    except Exception as e:
+        curtime = str(datetime.datetime.now())
+        logging.error(e)
+        logging.error(f"Conn gathering failed at {curtime}")

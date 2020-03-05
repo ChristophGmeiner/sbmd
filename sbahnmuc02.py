@@ -7,6 +7,8 @@ import pytictoc
 import multiprocessing as mp
 from itertools import chain
 import numpy as np
+import logging
+import datetime
 
 def all_station(p, s_object=schiene.Schiene()):
     '''
@@ -90,10 +92,10 @@ def main():
     
     fileobj = [real_stations, stations_iter, stations_iter_parts_list]
     
-    with open("/home/ec2-user/sbmd/station", "wb") as sf:
+    with open("/home/ubuntu/sbmd/station", "wb") as sf:
         pickle.dump(fileobj, sf)
         
-    credfile = "/home/ec2-user/sbmd/dwh.cfg"
+    credfile = "/home/ubuntu/sbmd/dwh.cfg"
 
     config = configparser.ConfigParser()
     config.read(credfile)
@@ -104,10 +106,17 @@ def main():
     s3 = boto3.resource('s3',
                 aws_access_key_id=s3k,
                 aws_secret_access_key= s3ks)
-    s3.meta.client.upload_file("/home/ec2-user/sbmd/station", "sbmdother", 
+    s3.meta.client.upload_file("/home/ubuntu/sbmd/station", "sbmdother", 
                                "station")
     
-    print(t.toc())
+    logging.info("Stations gathered succesfully!")
+    logging.info(t.toc())
     
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    
+    except Exception as e:
+        curtime = str(datetime.datetime.now())
+        logging.error(e)
+        logging.error(f"Station gathering failed at {curtime}")

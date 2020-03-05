@@ -3,7 +3,8 @@ import configparser
 from CreateTables import droptable_queries, createtable_queries
 
 def drop_tables(cur, conn):
-    '''drops all necessary tables before creating new ones, based on sql_queries.py module
+    '''drops all necessary tables before creating new ones, based on 
+    sql_queries.py module
     INPUT:
     cur: A postgres / psycopg2 cursor object for fulfilling the drop tasks
     conn: A postgres / psycopg2 connection concerning the cur

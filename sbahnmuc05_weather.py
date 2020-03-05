@@ -4,9 +4,10 @@ from pytictoc import TicToc
 import pyowm
 import boto3
 import multiprocessing as mp
+import logging
 
 def load_weather(c, s3key, s3skey, 
-                 owmfile = "/home/ec2-user/sbmd/owm.txt"):
+                 owmfile = "/home/ubuntu/sbmd/owm.txt"):
     
         try:
             
@@ -35,10 +36,10 @@ def load_weather(c, s3key, s3skey,
             bucket = s3.Bucket("sbmd3weather2")
                 
             bucket.upload_file(filename, filename)
-            
+            s
         except Exception as e:
-            print(c)
-            print(e)
+            logging.error(c)
+            logging.error(e)
 
 def main():
 
@@ -47,12 +48,12 @@ def main():
     t = TicToc()
     t.tic()
     
-    cities = ["München", "Puchheim", "Germering", "Fürstenfeldbruck", "Gersthofen",
-              "Olching", "Gröbenzell", "Murnau", "Miesbach",
+    cities = ["München", "Puchheim", "Germering", "Fürstenfeldbruck", 
+              "Olching", "Gröbenzell", "Murnau", "Miesbach", "Gersthofen",
               "Wolfratshausen", "Starnberg", "Gernlinden", "Eichstätt",
               "Maisach", "Mammendorf", "Schöngeising", "Geltendorf",
               "Buchenau", "Eichenau", "Holzkirchen", "Ebersberg", "Grafing", 
-              "Zorneding", "Freising", "Haar", "Wasserburg am Inn", "Mittenwald",
+              "Zorneding", "Freising", "Haar", "Wasserburg am Inn", 
               "Rosenheim", "Augsburg", "Geretsried", "Waldkraiburg",
               "Ingolstadt", "Donauwörth", "Unterhaching", "Taufkirchen",
               "Erding", "Dachau", "Tutzing", "Feldafing", "Schrobenhausen",
@@ -63,14 +64,14 @@ def main():
               "Gilching", "Türkenfeld", "Petershausen",
               "Röhrmoos", "Hallbergmoos", "Ismaning", "Bayrischzell",
               "Unterföhring", "Daglfing", "Unterschleißheim",
-              "Heimstetten", "Tegernsee", "Lenggries",
+              "Heimstetten", "Tegernsee", "Lenggries", "Mittenwald",
               "Aying", "Vaterstetten", "Baldham", "Steinebach",
               "Weßling", "Deisenhofen", "Sauerlach", "Otterfing", 
               "Kreuzstraße", "Ottobrunn", "Hohenbrunn",
               "Oberschleißheim", "Eching", "Neufahrn", "Altomünster",
               "Schwabhausen", "Karlsfeld", "Kolbermoor", "Bad Aibling"]
     
-    credfile = "/home/ec2-user/sbmd/dwh.cfg"
+    credfile = "/home/ubuntu/sbmd/dwh.cfg"
     config = configparser.ConfigParser()
     config.read(credfile)
             
@@ -84,4 +85,11 @@ def main():
     t.toc() 
     
 if __name__ == "__main__":
-    main()
+    try: 
+        main()
+        logging.info("Weather Data loaded succesfull!")
+        
+    except Exception as e:
+        logging.error(e)
+        curtime = str(datetime.now())
+        logging.error(f"Weather Gaterhing failed on {curtime}")
