@@ -1,0 +1,15 @@
+[Unit]
+Description=Airflow scheduler daemon
+After=network.target  
+#Wants=postgresql.service mysql.service
+[Service]
+Environment="PATH=/home/ubuntu/.local/bin:$PATH:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin"
+Environment="AIRFLOW_HOME=/home/ubuntu/airflow"
+User=ubuntu
+#Group=airflow
+Type=simple
+ExecStart=/home/ubuntu/.local/bin/airflow scheduler
+Restart=always
+RestartSec=5s
+[Install]
+WantedBy=multi-user.target
