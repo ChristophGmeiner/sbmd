@@ -75,6 +75,11 @@ def load_trains_all(conns, s3key_p, s3skey_p):
         logging.error(e)
         
 def main():
+    
+    logpath = "/home/ubuntu/sbmd/logs/"
+    normlogfilename = "sb03log _" + sys.argv[1] + "_" \
+                  + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M") + ".log"
+    logging.basicConfig(filename=logpath+normlogfilename, level=logging.DEBUG)
 
     t = TicToc()
 

@@ -80,6 +80,11 @@ def gmap_query_all(c, s3key_p, s3skey_p, api_key_p):
         logging.error(e)
         
 def main():
+    
+    logpath = "/home/ubuntu/sbmd/logs/"
+    normlogfilename = "sb04log _" \
+                  + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M") + ".log"
+    logging.basicConfig(filename=logpath+normlogfilename, level=logging.DEBUG)
 
     t = pytictoc.TicToc()
     
