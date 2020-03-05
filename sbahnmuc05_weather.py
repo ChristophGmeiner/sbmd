@@ -5,6 +5,11 @@ import pyowm
 import boto3
 import multiprocessing as mp
 import logging
+                
+logpath = "/home/ubuntu/sbmd/logs/"
+normlogfilename = "sb05log_" \
+      + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M") + ".log"
+logging.basicConfig(filename=logpath+normlogfilename, level=logging.DEBUG)
 
 def load_weather(c, s3key, s3skey, 
                  owmfile = "/home/ubuntu/sbmd/owm.txt"):
@@ -40,12 +45,6 @@ def load_weather(c, s3key, s3skey,
             logging.error(e)
 
 def main():
-
-                
-    logpath = "/home/ubuntu/sbmd/logs/"
-    normlogfilename = "sb05log_" \
-          + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M") + ".log"
-    logging.basicConfig(filename=logpath+normlogfilename, level=logging.DEBUG)
     
     pool = mp.Pool(mp.cpu_count())
     
@@ -89,11 +88,7 @@ def main():
     t.toc() 
     
 if __name__ == "__main__":
-    try: 
-        main()
-        logging.info("Weather Data loaded succesfull!")
-        
-    except Exception as e:
-        logging.error(e)
-        curtime = str(datetime.now())
-        logging.error(f"Weather Gaterhing failed on {curtime}")
+
+    main()
+    logging.info("Weather Data loaded succesfull!")
+

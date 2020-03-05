@@ -10,6 +10,11 @@ from pytictoc import TicToc
 import multiprocessing as mp
 import logging
 
+logpath = "/home/ubuntu/sbmd/logs/"
+normlogfilename = "sb03log_" + sys.argv[1] + "_" \
+              + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M") + ".log"
+logging.basicConfig(filename=logpath+normlogfilename, level=logging.DEBUG)
+
 def load_train(start, end, s3key, s3skey, 
                s = schiene.Schiene()):
     '''
@@ -75,11 +80,6 @@ def load_trains_all(conns, s3key_p, s3skey_p):
         logging.error(e)
         
 def main():
-    
-    logpath = "/home/ubuntu/sbmd/logs/"
-    normlogfilename = "sb03log_" + sys.argv[1] + "_" \
-                  + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M") + ".log"
-    logging.basicConfig(filename=logpath+normlogfilename, level=logging.DEBUG)
 
     t = TicToc()
 
@@ -108,10 +108,4 @@ def main():
     t.toc()
     
 if __name__ == "__main__":
-    try:
-        main()
-    
-    except Exception as e:
-        curtime = str(datetime.datetime.now())
-        logging.error(e)
-        logging.error(f"Conn gathering failed at {curtime}")
+    main()
