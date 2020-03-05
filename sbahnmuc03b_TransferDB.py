@@ -13,6 +13,11 @@ import logging
 
 t = pytictoc.TicToc()
 t.tic()
+            
+logpath = "/home/ubuntu/sbmd/logs/"
+normlogfilename = "sb03blog _" \
+      + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M") + ".log"
+logging.basicConfig(filename=logpath+normlogfilename, level=logging.DEBUG)
 
 config = configparser.ConfigParser()
 config.read("/home/ubuntu/sbmd/dwh.cfg")
