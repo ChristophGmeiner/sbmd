@@ -83,7 +83,7 @@ def main():
     
     logpath = "/home/ubuntu/sbmd/logs/"
     normlogfilename = "sb04log_" \
-                  + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M") + ".log"
+                  + datetime.now().strftime("%Y-%m-%d_%H-%M") + ".log"
     logging.basicConfig(filename=logpath+normlogfilename, level=logging.DEBUG)
 
     t = pytictoc.TicToc()
