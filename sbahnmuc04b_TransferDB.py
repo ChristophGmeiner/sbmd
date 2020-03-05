@@ -5,19 +5,12 @@ import os
 import json
 import pytictoc
 from sqlalchemy import create_engine
-import sys
 import datetime
 import logging
 
 t = pytictoc.TicToc()
 t.tic()
 
-class Printer():
-    """Print things to stdout on one line dynamically"""
-    def __init__(self,data):
-        sys.stdout.write("\r\x1b[K"+data.__str__())
-        sys.stdout.flush()
-        
 config = configparser.ConfigParser()
 config.read("/home/ubuntu/sbmd/dwh.cfg")
 

@@ -5,7 +5,6 @@ import os
 import json
 import pytictoc
 from sqlalchemy import create_engine
-import sys
 import datetime
 import logging
 
