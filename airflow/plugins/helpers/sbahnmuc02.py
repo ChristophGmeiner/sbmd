@@ -112,11 +112,11 @@ def main():
     logging.info("Stations gathered succesfully!")
     logging.info(t.toc())
     
-if __name__ == "__main__":
-    try:
-        main()
-    
-    except Exception as e:
-        curtime = str(datetime.datetime.now())
-        logging.error(e)
-        logging.error(f"Station gathering failed at {curtime}")
+#if __name__ == "__main__":
+#    try:
+#        main()
+#    
+#    except Exception as e:
+#        curtime = str(datetime.datetime.now())
+#        logging.error(e)
+#        logging.error(f"Station gathering failed at {curtime}")
