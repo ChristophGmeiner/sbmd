@@ -111,12 +111,12 @@ def main():
     
     t.toc()
     
-#if __name__ == "__main__":
-#    try: 
-#        main()
-#        logging.info("Gmap Data loaded succesfull!")
-#        
-#    except Exception as e:
-#        logging.error(e)
-#        curtime = str(datetime.now())
-#        logging.error(f"Gmap Gaterhing failed on {curtime}")
+if __name__ == "__main__":
+    try: 
+        main()
+        logging.info("Gmap Data loaded succesfull!")
+        
+    except Exception as e:
+        logging.error(e)
+        curtime = str(datetime.now())
+        logging.error(f"Gmap Gaterhing failed on {curtime}")

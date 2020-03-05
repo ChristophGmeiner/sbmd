@@ -74,7 +74,7 @@ def load_trains_all(conns, s3key_p, s3skey_p):
         logging.error("Error at second round for " + conns[0] + "_" + conns[1])
         logging.error(e)
         
-def main(n):
+def main():
 
     t = TicToc()
 
@@ -83,7 +83,7 @@ def main(n):
     with open("/home/ubuntu/sbmd/station", "rb") as f:
         fileobj = pickle.load(f) 
 	
-    statit = fileobj[2][n]
+    statit = fileobj[2][int(sys.argv[1])]
 
     credfile = "/home/ubuntu/sbmd/dwh.cfg"
 
@@ -99,11 +99,11 @@ def main(n):
             
     t.toc()
     
-#if __name__ == "__main__":
-#    try:
-#        main()
-#    
-#    except Exception as e:
-#        curtime = str(datetime.datetime.now())
-#        logging.error(e)
-#        logging.error(f"Conn gathering failed at {curtime}")
+if __name__ == "__main__":
+    try:
+        main()
+    
+    except Exception as e:
+        curtime = str(datetime.datetime.now())
+        logging.error(e)
+        logging.error(f"Conn gathering failed at {curtime}")
