@@ -9,10 +9,12 @@ delsql1 = """
 
 delsql2 = """
             DELETE FROM t_gmap01_live
-            WHERE "timestamp" || '_' || start_loc || '_' || end_loc
+            WHERE CAST("timestamp" AS TIMESTAMP) || '_' || start_loc 
+            || '_' || end_loc
             IN
                 (SELECT DISTINCT
-                    "timestamp" || '_' || stat1 || '_' || stat2
+                    CAST("timestamp" AS TIMESTAMP) || '_' || stat1 || '_' 
+                    || stat2
                 FROM t_gmap01_stagings)
           """
 
@@ -149,7 +151,7 @@ inssql3 = """
                 weather_sunrise_time, 
                 weather_sunset_time, 
                 weather_temperature_temp, 
-                weather_temperature_temp_kf, 
+                CAST (weather_temperature_temp_kf AS FLOAT), 
                 weather_temperature_temp_max, 
                 weather_temperature_temp_min, 
                 weather_visibility_distance, 
