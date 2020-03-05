@@ -1,95 +1,89 @@
 from airflow import DAG
 from datetime import datetime, timedelta
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.bash_operator import BashOperator
 from airflow.operators.sensors import TimeDeltaSensor
-
-from helpers import main02
-from helpers import main03
-from helpers import main04
-from helpers import main05
 
 default_args = {
         "owner": "Christoph Gmeiner",
-        "start_date": datetime(2020, 3, 4, 21, 0),
+        "start_date": datetime(2020, 2, 23),
         "retries": 2,
-        "retry_delay": timedelta(seconds=100),
+        "retry_delay": timedelta(seconds=300),
         "email": "christoph.gmeiner@gmail.com",
         "email_on_retry": True,
         "email_on_success": True,
-        "catchup": False,
         "depends_on_past": True,
-        "trigger_rule": "all_done"
+        "triiger_rle": "all_done"
         }
 
 dag = DAG("sbmd01_web_data_gathering",
           description="Gathers all necessary web data",
-          default_args=default_args,
-          schedule_interval="0 * * * *",
+          args=default_args,
+          scheduleinterval="0 * * * *",
           max_active_runs=1)
 
-create_stations_task = PythonOperator(
+create_stations_task = BashOperator(
         task_id="01_create_stations_task",
-        python_callable=main02,
+        bash_command=" python3 /home/ubuntu/sbmd/sbahnmuc02.py",
         dag=dag)
 
-conn_task_1 = PythonOperator(
+conn_task_1 = BashOperator(
         task_id="02_connection_task1",
-        python_callable=main03(0),
+        bash_command="python3 /home/ubuntu/sbmd/sbahnmuc03.py 0",
         dag=dag)
 
-conn_task_2 = PythonOperator(
+conn_task_2 = BashOperator(
         task_id="02_connection_task2",
-        python_callable=main03(1),
+        bash_command="python3 /home/ubuntu/sbmd/sbahnmuc03.py 1",
         dag=dag)
 
-conn_task_3 = PythonOperator(
+conn_task_3 = BashOperator(
         task_id="02_connection_task3",
-        python_callable=main03(2),
+        bash_command="python3 /home/ubuntu/sbmd/sbahnmuc03.py 2",
         dag=dag)
 
-conn_task_4 = PythonOperator(
+conn_task_4 = BashOperator(
         task_id="02_connection_task4",
-        python_callable=main03(3),
+        bash_command="python3 /home/ubuntu/sbmd/sbahnmuc03.py 3",
         dag=dag)
 
-conn_task_5 = PythonOperator(
+conn_task_5 = BashOperator(
         task_id="02_connection_task5",
-        python_callable=main03(4),
+        bash_command="python3 /home/ubuntu/sbmd/sbahnmuc03.py 4",
         dag=dag)
 
-conn_task_6 = PythonOperator(
+conn_task_6 = BashOperator(
         task_id="02_connection_task6",
-        python_callable=main03(5),
+        bash_command="python3 /home/ubuntu/sbmd/sbahnmuc03.py 5",
         dag=dag)
 
-conn_task_7 = PythonOperator(
+conn_task_7 = BashOperator(
         task_id="02_connection_task7",
-        python_callable=main03(6),
+        bash_command="python3 /home/ubuntu/sbmd/sbahnmuc03.py 6",
         dag=dag)
 
-conn_task_8 = PythonOperator(
+conn_task_8 = BashOperator(
         task_id="02_connection_task8",
-        python_callable=main03(7),
+        bash_command="python3 /home/ubuntu/sbmd/sbahnmuc03.py 7",
         dag=dag)
 
-conn_task_9 = PythonOperator(
+conn_task_9 = BashOperator(
         task_id="02_connection_task9",
-        python_callable=main03(8),
+        bash_command="python3 /home/ubuntu/sbmd/sbahnmuc03.py 8",
         dag=dag)
 
-conn_task_10 = PythonOperator(
+conn_task_10 = BashOperator(
         task_id="02_connection_task10",
-        python_callable=main03(9),
+        bash_command="python3 /home/ubuntu/sbmd/sbahnmuc03.py 9",
         dag=dag)
 
-gmap_task = PythonOperator(
+gmap_task = BashOperator(
         task_id="03_gmap_data",
-        python_callable=main04,
+        bash_command="python3 /home/ubuntu/sbmd/sbahnmuc04_gmaps.py",
         dag=dag)
 
-weather_task = PythonOperator(
+weather_task = BashOperator(
         task_id= "04_weather_data",
-        python_callable=main05,
+        bash_command="python3 /home/ubuntu/sbmd/sbahnmuc05_weather.py",
         dag=dag)
 
 t1 = TimeDeltaSensor(
@@ -137,6 +131,11 @@ t9 = TimeDeltaSensor(
     delta=timedelta(minutes=45),
     dag=dag)
 
+rm_json_task = BashOperator(
+        task_id="06_Remove_local_jsons",
+        bash_command="./home/ubuntu/zz04_rm_json.sh",
+        dag=dag)
+
 create_stations_task >> conn_task_1
 create_stations_task >> t1
 t1 >> conn_task_2
@@ -159,3 +158,5 @@ t9 >> conn_task_10
 
 conn_task_10 >> gmap_task
 gmap_task >> weather_task
+
+weather_task >> rm_json_task
