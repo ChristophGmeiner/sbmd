@@ -52,7 +52,7 @@ response = client.restore_db_instance_from_db_snapshot(
         AvailabilityZone="eu-central-1b",
         PubliclyAccessible=True,
         Engine="postgres",
-        VpcSecurityGroupIds=["sg-0010016f8c9f15a2d"],
+        VpcSecurityGroupIds=["sg-00496c38f5351e4ea"],
         DeletionProtection=False)
 
 dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
