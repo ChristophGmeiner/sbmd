@@ -6,7 +6,7 @@ import time
 
 default_args = {
         "owner": "Christoph Gmeiner",
-        "start_date": datetime(2020, 3, 4, 22, 0),
+        "start_date": datetime(2020, 3, 5, 17, 0),
         "retries": 1,
         "retry_delay": timedelta(seconds=60),
         "email": "christoph.gmeiner@gmail.com",
