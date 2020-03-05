@@ -1,7 +1,8 @@
 from airflow import DAG
 from datetime import datetime, timedelta
 from airflow.operators.bash_operator import BashOperator
-from airflow.operators.sensors import TimeDeltaSensor
+from airflow.operators.python_operator import PythonOperator
+import time
 
 default_args = {
         "owner": "Christoph Gmeiner",
@@ -14,6 +15,9 @@ default_args = {
         "depends_on_past": True,
         "trigger_rule": "all_done"
         }
+
+def wait(n=300):
+    time.sleep(n)
 
 dag = DAG("sbmd01_web_data_gathering",
           description="Gathers all necessary web data",
@@ -86,49 +90,49 @@ weather_task = BashOperator(
         bash_command="python3 /home/ubuntu/sbmd/sbahnmuc05_weather.py",
         dag=dag)
 
-t1 = TimeDeltaSensor(
+t1 = PythonOperator(
     task_id='wait1',
-    delta=timedelta(minutes=5),
+    python_callable=wait,
     dag=dag)
 
-t2 = TimeDeltaSensor(
+t2 = PythonOperator(
     task_id='wait2',
-    delta=timedelta(minutes=10),
+    python_callable=wait,
     dag=dag)
 
-t3 = TimeDeltaSensor(
-    task_id='wait3',    
-    delta=timedelta(minutes=15),
+t3 = PythonOperator(
+    task_id='wait3',
+    python_callable=wait,
     dag=dag)
 
-t4 = TimeDeltaSensor(
+t4 = PythonOperator(
     task_id='wait4',
-    delta=timedelta(minutes=20),
+    python_callable=wait,
     dag=dag)
 
-t5 = TimeDeltaSensor(
+t5 = PythonOperator(
     task_id='wait5',
-    delta=timedelta(minutes=25),
+    python_callable=wait,
     dag=dag)
 
-t6 = TimeDeltaSensor(
+t6 = PythonOperator(
     task_id='wait6',
-    delta=timedelta(minutes=30),
+    python_callable=wait,
     dag=dag)
 
-t7 = TimeDeltaSensor(
+t7 = PythonOperator(
     task_id='wait7',
-    delta=timedelta(minutes=35),
+    python_callable=wait,
     dag=dag)
 
-t8 = TimeDeltaSensor(
+t8 = PythonOperator(
     task_id='wait8',
-    delta=timedelta(minutes=40),
+    python_callable=wait,
     dag=dag)
 
-t9 = TimeDeltaSensor(
+t9 = PythonOperator(
     task_id='wait9',
-    delta=timedelta(minutes=45),
+    python_callable=wait,
     dag=dag)
 
 rm_json_task = BashOperator(
@@ -138,25 +142,33 @@ rm_json_task = BashOperator(
 
 create_stations_task >> conn_task_1
 create_stations_task >> t1
+
 t1 >> conn_task_2
 t1 >> t2
+
 t2 >> conn_task_3
 t2 >> t3
+
 t3 >> conn_task_4
 t3 >> t4
+
 t4 >> conn_task_5
 t4 >> t5
+
 t5 >> conn_task_6
 t5 >> t6
+
 t6 >> conn_task_7
 t6 >> t7
+
 t7 >> conn_task_8
 t7 >> t8
+
 t8 >> conn_task_9
 t8 >> t9
+
 t9 >> conn_task_10
+t9 >> gmap_task
 
-conn_task_10 >> gmap_task
 gmap_task >> weather_task
-
 weather_task >> rm_json_task
