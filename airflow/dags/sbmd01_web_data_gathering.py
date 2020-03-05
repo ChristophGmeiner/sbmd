@@ -18,7 +18,7 @@ default_args = {
 dag = DAG("sbmd01_web_data_gathering",
           description="Gathers all necessary web data",
           default_args=default_args,
-          schedule_interval="0 * * * *",
+          schedule_interval="0 3-23 * * *",
           max_active_runs=1)
 
 create_stations_task = BashOperator(
