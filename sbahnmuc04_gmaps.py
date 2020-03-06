@@ -73,7 +73,7 @@ def gmap_query_all(c, s3key_p, s3skey_p, api_key_p):
        gmap_query(c[0], c[1], s3key_p, s3skey_p, api_key_p)
         
     except Exception as e:
-        logging.error("Error at first round for " + c)
+        logging.error("Error at first round for " + c[0])
         logging.error(e)
         
     try:
@@ -81,7 +81,7 @@ def gmap_query_all(c, s3key_p, s3skey_p, api_key_p):
        gmap_query(c[1], c[0], s3key_p, s3skey_p, api_key_p)
         
     except Exception as e:
-        logging.error("Error at second round for " + c)
+        logging.error("Error at second round for " + c[1])
         logging.error(e)
         
 def main():
