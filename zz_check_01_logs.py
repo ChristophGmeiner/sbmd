@@ -28,8 +28,8 @@ for lf in logfiles:
             preerrorlist.append(p)
         if preerrorlist:
             errordict[lf] = preerrorlist
-    s3object = s3.Object("sbmdother", s3logfolder + lf)
-    s3object.upload_file(path + "/" + lf)
+    s3object = s3.Object("sbmdother", s3logfolder + "/" + lf)
+    s3object.upload_file(path + lf)
     os.remove(path + lf)
 
 s3_filename = "/errorlog_01_" + str(date.today()) + ".json"
