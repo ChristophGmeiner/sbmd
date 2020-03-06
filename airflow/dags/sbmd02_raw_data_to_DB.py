@@ -11,14 +11,15 @@ default_args = {
         "email_on_retry": True,
         "email_on_success": True,
 	"email_on_failure": False,
-        "depends_on_past": True
+        "depends_on_past": False
         }
 
 dag = DAG("sbmd02rawdatatoDB",
           description="Creates DBs and loads raw data from S3 to Postgres DB",
           default_args=default_args,
           schedule_interval="1 0 * * 1",
-          max_active_runs=1)
+          max_active_runs=1,
+	  catchup=False)
 
 create_DB_task = BashOperator(
         task_id="01_create_DB_task",

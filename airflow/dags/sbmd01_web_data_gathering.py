@@ -6,13 +6,13 @@ import time
 
 default_args = {
         "owner": "Christoph Gmeiner",
-        "start_date": datetime(2020, 3, 5, 17, 0),
+        "start_date": datetime(2020, 3, 6, 11, 0),
         "retries": 1,
         "retry_delay": timedelta(seconds=60),
         "email": "christoph.gmeiner@gmail.com",
         "email_on_retry": True,
         "email_on_success": True,
-        "depends_on_past": True,
+        "depends_on_past": False,
         "trigger_rule": "all_done"
         }
 
@@ -22,8 +22,9 @@ def wait(n=300):
 dag = DAG("sbmd01_web_data_gathering",
           description="Gathers all necessary web data",
           default_args=default_args,
-          schedule_interval="0 3-23 * * *",
-          max_active_runs=1)
+          schedule_interval="@hourly",
+          max_active_runs=1,
+	  catchup=False)
 
 create_stations_task = BashOperator(
         task_id="01_create_stations_task",
