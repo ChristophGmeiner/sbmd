@@ -25,9 +25,10 @@ If you choose other packages than Schiene, you could also expand the proces to a
 The data pipeline consists of three steps
 
 ## Data gathering
-This process involves mainly web scrapping via the mentioned above APIs and storing each API request as a json files in different S3 buckets (one for train, one for car and another one for weather data). This is carried out on an AWS EC2 and is scheduled via crontab. Also the start and stop of the EC2 is scheduled on another (very low cost) EC2, which is always on.
+This process involves mainly web scrapping via the mentioned above APIs and storing each API request as a json files in different S3 buckets (one for train, one for car and another one for weather data). This is carried out on an AWS EC2 and is scheduled via Apache Airflow. Also the start and stop of the EC2 is scheduled on another (very low cost) EC2, which is always on.
+Please see the gathering DAG below:
 
-This process of couse could also be carried out with Apache Airflow. Since the EC2 I rented was to weak for managing many parallel processes, this was not set productive.
+![](sbmd_dag01.png)
 
 I chose S3 and the json format, since it is the most natural way to store this data (since the API request result in single a single json file per record). In this way the raw data can be stored flexible and marked accordingly when loaded to the database. Therfore I have perfect control, what data was already loaded, what was not yet loaded and when what was loaded.
 Also concerning costs it is - according to my current knowledge - the most sufficient way for this process.
