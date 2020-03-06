@@ -48,6 +48,10 @@ In the long run, one could think about making individual operators for these pur
 I chose S3 and the json format, since it is the most natural way to store this data (since the API request result in single a single json file per record). In this way the raw data can be stored flexible and marked accordingly when loaded to the database. Therfore I have perfect control, what data was already loaded, what was not yet loaded and when what was loaded.
 Also concerning costs it is - according to my current knowledge - the most sufficient way for this process.
 
+### Quality check
+As a second step the Airflow dag carries out a data quality check. As each task in the dag logs everything they do in a local error log file (e.g. in case a single request causes an error and error gets locked, see files below for more details on that), after one dag run there are many log files on the local drive. It would be interesting to find very quick only the relvant error, i.e. to find out what request caused an error and why.
+Therefore the zz_errorlogging_task runs through all locally saved log files and searches for the word "error:". If it is found, these messages are gathered in a json file with the logfilename as key. After that all logfiles from a specific point of time are transferred to time-stamped folder in a S3 bucket an deleted from local drive.
+
 ### Relevant files
 
 All confidential data is stored in a local config file and loaded to the cripts via configparser.
@@ -66,6 +70,9 @@ This script gathers the weather data.
 
 #### airflow/dags/sbmd01_web_dat_gathering.py
 The mentioned above dag.
+
+#### zz_check_01_logs.py
+See Quality checks part on that. This python script is carried out in the errorlogging task.
 
 ## Data transferring
 This process is about aggregating and transforming the json data from the step before and transfer it into Postgres tables (running on a AWS RDS service).
