@@ -30,6 +30,9 @@ Please see the gathering DAG below:
 
 ![](sbmd_dag01.png)
 
+The overall dag runs max. 1 hour. I inserted all the waiting tasks for stretching out the web requests. Basically all the gatering work is done with BashOperators calling the relevant Python scripts (see below).
+In the long run, one could think about making individual operators for these purposes.
+
 I chose S3 and the json format, since it is the most natural way to store this data (since the API request result in single a single json file per record). In this way the raw data can be stored flexible and marked accordingly when loaded to the database. Therfore I have perfect control, what data was already loaded, what was not yet loaded and when what was loaded.
 Also concerning costs it is - according to my current knowledge - the most sufficient way for this process.
 
@@ -56,12 +59,13 @@ This process is about aggregating and transforming the json data from the step b
 In a first step the database gets created from a snapshot. For the initial load the live tables will be created. 
 After that - using the first three scripts below - the data is transformed to a dataframa, bulk copied to a postgres staging table, inserted into the respective live tables and finally all transferred json files are archived into a newly created folder in the respective S3 bucket.
 
-After this has finished, the database will be saved in a snapshot and deleted again, due to cost reasons.
+After this has finished, the database will be saved in a snapshot and deleted again, due to cost reasons. This snapshot will be used when creating the database for the next run.
 
-This process is carried out once a week and triggered via crontab on the same EC2 as for the data gathering process.
+This process is carried out once a week and triggered via Apache Airflow on the same EC2 as for the data gathering process. Please see the DAG below:
 
-This process of couse could also be carried out with Apache Airflow. Since the EC2 I rented was to weak for managing many parallel processes, this was not set productive.
-Nevertheless I created a dag here for demonstration purposes, but due to cost restrictions it never went productive.
+![](sbmd_dag02.png)
+
+Also this dag consists only of BashOperators calling the relevant Python scripts (see below). In the long run, one could think about making individual operators for these purposes.
 
 I chose postgres here, since the data should be stored in a relational way. Since the data is currently not that big and proper indexed AWS Redshift or another MPP database is not necessary.
 Of course,m when the datra should be scaled - e.g. to all areas in Germany - postgres would not be sufficient anymore. Than maybe Appache Cassandra or a direct transfer to AWS redshift should be preferred.
