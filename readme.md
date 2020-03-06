@@ -52,6 +52,8 @@ This script gathers the date from Google map API. Due tothe fact this API gets v
 #### sbahnmuc05_weather.py
 This script gathers the weather data.
 
+#### airflow/dags/sbmd01_web_dat_gathering.py
+The mentioned above dag.
 
 ## Data transferring
 This process is about aggregating and transforming the json data from the step before and transfer it into Postgres tables (running on a AWS RDS service).
@@ -65,7 +67,8 @@ This process is carried out once a week and triggered via Apache Airflow on the 
 
 ![](sbmd_dag02.png)
 
-Also this dag consists only of BashOperators calling the relevant Python scripts (see below). In the long run, one could think about making individual operators for these purposes.
+Also this dag consists only of BashOperators calling the relevant Python scripts (see below) and runs approx. for three hours. It is triggered once a week.
+In the long run, one could think about making individual operators for these purposes.
 
 I chose postgres here, since the data should be stored in a relational way. Since the data is currently not that big and proper indexed AWS Redshift or another MPP database is not necessary.
 Of course,m when the datra should be scaled - e.g. to all areas in Germany - postgres would not be sufficient anymore. Than maybe Appache Cassandra or a direct transfer to AWS redshift should be preferred.
