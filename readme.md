@@ -196,4 +196,10 @@ This scripts start or stop the productive VM
 ### zz04_rm_json.sh
 Script used for deleting old json files, which are temporarily stored on disc of the EC2 during the data gathering process.
 
+### systemd folder
+Systemd files for auto-start of Airflow services.
+
+### airflow/dags/test.py
+Test dag.
+
 
