@@ -13,7 +13,8 @@ default_args = {
         "email_on_retry": True,
         "email_on_success": True,
         "depends_on_past": False,
-        "trigger_rule": "all_done"
+        "trigger_rule": "all_done",
+        "sla": timedelta(minutes=59)
         }
 
 def wait(n=300):
@@ -29,6 +30,7 @@ dag = DAG("sbmd01_web_data_gathering",
 create_stations_task = BashOperator(
         task_id="01_create_stations_task",
         bash_command=" python3 /home/ubuntu/sbmd/sbahnmuc02.py",
+	sla=timedelta(seconds=90),
         dag=dag)
 
 conn_task_1 = BashOperator(
