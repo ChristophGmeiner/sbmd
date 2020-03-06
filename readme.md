@@ -3,6 +3,18 @@
 This git repo shows a way on how to gather structured and long-term traffic analytical information of the Greater Munich area. This contains data about many train and car connections and weather data.
 This is also my Capstone project for my Udacity Nanodegree in Data Engineering.
 
+The main goal of this project is to:
+- store data which is only live available in a structured way
+- make the storing (ETL) process stable and transparent
+- make analysis based on this data concerning:
+    - Delays
+    - Quicker means of transportation
+    - Patterns in delays etc.., based on e.g.:
+        - Weather
+        - Time
+        - etc.
+    - etc.
+
 This is mainly done by the schiene python module (for more information on that, please see here: https://github.com/kennell/schiene/blob/master/README.md). \
 Thanks for the great package to the developers.
 
@@ -25,9 +37,13 @@ If you choose other packages than Schiene, you could also expand the proces to a
 The data pipeline consists of three steps
 
 ## Data gathering
-This process involves mainly web scrapping via the mentioned above APIs and storing each API request as a json files in different S3 buckets (one for train, one for car and another one for weather data). This is carried out on an AWS EC2 and is scheduled via crontab. Also the start and stop of the EC2 is scheduled on another (very low cost) EC2, which is always on.
+This process involves mainly web scrapping via the mentioned above APIs and storing each API request as a json files in different S3 buckets (one for train, one for car and another one for weather data). This is carried out on an AWS EC2 and is scheduled via Apache Airflow. Also the start and stop of the EC2 is scheduled on another (very low cost) EC2, which is always on.
+Please see the gathering DAG below:
 
-This process of couse could also be carried out with Apache Airflow. Since the EC2 I rented was to weak for managing many parallel processes, this was not set productive.
+![](sbmd_dag01.png)
+
+The overall dag runs max. 1 hour. I inserted all the waiting tasks for stretching out the web requests. Basically all the gatering work is done with BashOperators calling the relevant Python scripts (see below).
+In the long run, one could think about making individual operators for these purposes.
 
 I chose S3 and the json format, since it is the most natural way to store this data (since the API request result in single a single json file per record). In this way the raw data can be stored flexible and marked accordingly when loaded to the database. Therfore I have perfect control, what data was already loaded, what was not yet loaded and when what was loaded.
 Also concerning costs it is - according to my current knowledge - the most sufficient way for this process.
@@ -48,6 +64,8 @@ This script gathers the date from Google map API. Due tothe fact this API gets v
 #### sbahnmuc05_weather.py
 This script gathers the weather data.
 
+#### airflow/dags/sbmd01_web_dat_gathering.py
+The mentioned above dag.
 
 ## Data transferring
 This process is about aggregating and transforming the json data from the step before and transfer it into Postgres tables (running on a AWS RDS service).
@@ -55,12 +73,14 @@ This process is about aggregating and transforming the json data from the step b
 In a first step the database gets created from a snapshot. For the initial load the live tables will be created. 
 After that - using the first three scripts below - the data is transformed to a dataframa, bulk copied to a postgres staging table, inserted into the respective live tables and finally all transferred json files are archived into a newly created folder in the respective S3 bucket.
 
-After this has finished, the database will be saved in a snapshot and deleted again, due to cost reasons.
+After this has finished, the database will be saved in a snapshot and deleted again, due to cost reasons. This snapshot will be used when creating the database for the next run.
 
-This process is carried out once a week and triggered via crontab on the same EC2 as for the data gathering process.
+This process is carried out once a week and triggered via Apache Airflow on the same EC2 as for the data gathering process. Please see the DAG below:
 
-This process of couse could also be carried out with Apache Airflow. Since the EC2 I rented was to weak for managing many parallel processes, this was not set productive.
-Nevertheless I created a dag here for demonstration purposes, but due to cost restrictions it never went productive.
+![](sbmd_dag02.png)
+
+Also this dag consists only of BashOperators calling the relevant Python scripts (see below) and runs approx. for three hours. It is triggered once a week.
+In the long run, one could think about making individual operators for these purposes.
 
 I chose postgres here, since the data should be stored in a relational way. Since the data is currently not that big and proper indexed AWS Redshift or another MPP database is not necessary.
 Of course,m when the datra should be scaled - e.g. to all areas in Germany - postgres would not be sufficient anymore. Than maybe Appache Cassandra or a direct transfer to AWS redshift should be preferred.
@@ -175,5 +195,11 @@ This scripts start or stop the productive VM
 
 ### zz04_rm_json.sh
 Script used for deleting old json files, which are temporarily stored on disc of the EC2 during the data gathering process.
+
+### systemd folder
+Systemd files for auto-start of Airflow services.
+
+### airflow/dags/test.py
+Test dag.
 
 
