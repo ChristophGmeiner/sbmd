@@ -25,12 +25,17 @@ dag = DAG("sbmd01_web_data_gathering",
           default_args=default_args,
           schedule_interval="@hourly",
           max_active_runs=1,
-	  catchup=False)
+          catchup=False)
 
 create_stations_task = BashOperator(
         task_id="01_create_stations_task",
         bash_command=" python3 /home/ubuntu/sbmd/sbahnmuc02.py",
-	sla=timedelta(seconds=90),
+        sla=timedelta(seconds=90),
+        dag=dag)
+
+errorlogging_task = BashOperator(
+        task_id="zz_errorlogging_task",
+        bash_command=" python3 /home/ubuntu/sbmd/zz_check_01_logs.py",
         dag=dag)
 
 conn_task_1 = BashOperator(
@@ -139,6 +144,7 @@ t9 = PythonOperator(
     dag=dag)
 
 create_stations_task >> conn_task_1
+create_stations_task >> errorlogging_task
 create_stations_task >> t1
 
 t1 >> conn_task_2
