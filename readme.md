@@ -3,6 +3,18 @@
 This git repo shows a way on how to gather structured and long-term traffic analytical information of the Greater Munich area. This contains data about many train and car connections and weather data.
 This is also my Capstone project for my Udacity Nanodegree in Data Engineering.
 
+The main goal of this project is to:
+- store data which is only live available in a structured way
+- make the storing (ETL) process stable and transparent
+- make analysis based on this data concerning:
+    - Delays
+    - Quicker means of transportation
+    - Patterns in delays etc.., based on e.g.:
+        - Weather
+        - Time
+        - etc.
+    - etc.
+
 This is mainly done by the schiene python module (for more information on that, please see here: https://github.com/kennell/schiene/blob/master/README.md). \
 Thanks for the great package to the developers.
 
