@@ -2,10 +2,10 @@ import boto3
 import os
 import json
 import configparser
-from datetime import date
+from datetime import datetime
 import logging
 
-s3logfolder = "/errorlogs01_" + str(date.today())
+s3logfolder = "/errorlogs01_" + datetime.now().strftime("%Y-%m-%d_%H-%M")
 path = "/home/ubuntu/sbmd/logs/"
 logfiles = os.listdir(path)
 
@@ -32,10 +32,16 @@ for lf in logfiles:
     s3object.upload_file(path + lf)
     os.remove(path + lf)
 
-s3_filename = "/errorlog_01_" + str(date.today()) + ".json"
+s3_filename = "/errorlog_01_" + datetime.now().strftime("%Y-%m-%d_%H-%M"))) 
+			+ ".json"
 
 s3object = s3.Object("sbmdother", s3logfolder + s3_filename)
 
-s3object.put(Body=(bytes(json.dumps(errordict).encode('UTF-8'))))
+if errordict:
 
-logging.info("Evaluated and uploaded errorlog files!")
+    s3object.put(Body=(bytes(json.dumps(errordict).encode('UTF-8'))))
+    logging.info("Evaluated and uploaded errorlog files!")
+
+if len(errordict) > 0:
+    raise Exception(f"Errors logged to {s3_filename}")
+    logging.info("Errors found and files uploaded!") 
