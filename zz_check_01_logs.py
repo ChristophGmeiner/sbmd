@@ -32,8 +32,8 @@ for lf in logfiles:
     s3object.upload_file(path + lf)
     os.remove(path + lf)
 
-s3_filename = "/errorlog_01_" + datetime.now().strftime("%Y-%m-%d_%H-%M"))) 
-			+ ".json"
+s3_filename = "/errorlog_01_" + datetime.now().strftime("%Y-%m-%d_%H-%M") \
+              + ".json"
 
 s3object = s3.Object("sbmdother", s3logfolder + "/" + s3_filename)
 
