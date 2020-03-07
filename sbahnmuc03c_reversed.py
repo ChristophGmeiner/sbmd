@@ -12,7 +12,7 @@ import logging
 import numpy as np
 
 logpath = "/home/ubuntu/sbmd/logs/"
-normlogfilename = "sb03log_" + sys.argv[1] + "_" \
+normlogfilename = "sb03clog_" + sys.argv[1] + "_" \
               + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M") + ".log"
 logging.basicConfig(filename=logpath+normlogfilename, level=logging.DEBUG)
 
