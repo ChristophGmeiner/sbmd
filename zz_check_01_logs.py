@@ -3,9 +3,8 @@ import os
 import json
 import configparser
 from datetime import datetime
-import logging
 
-s3logfolder = "/errorlogs01_" + datetime.now().strftime("%Y-%m-%d_%H-%M")
+s3logfolder = "errorlogs01_" + datetime.now().strftime("%Y-%m-%d_%H-%M")
 path = "/home/ubuntu/sbmd/logs/"
 logfiles = os.listdir(path)
 
@@ -16,7 +15,7 @@ s3skey = config["AWS"]["SECRET"]
 s3 = boto3.resource("s3", 
 		    aws_access_key_id=s3key, 
 		    aws_secret_access_key=s3skey)
-logging.info("Created creds...")
+print("Created creds...")
 
 errordict = {}
 for lf in logfiles:
@@ -35,13 +34,11 @@ for lf in logfiles:
 s3_filename = "/errorlog_01_" + datetime.now().strftime("%Y-%m-%d_%H-%M") \
               + ".json"
 
-s3object = s3.Object("sbmdother", s3logfolder + "/" + s3_filename)
+s3object = s3.Object("sbmdother", s3logfolder + s3_filename)
+
+print("Evaluated and uploaded errorlog files!")
 
 if errordict:
-
     s3object.put(Body=(bytes(json.dumps(errordict).encode('UTF-8'))))
-    logging.info("Evaluated and uploaded errorlog files!")
-
-if len(errordict) > 0:
+    print("Errors found and files uploaded!")
     raise Exception(f"Errors logged to {s3_filename}")
-    logging.info("Errors found and files uploaded!") 
