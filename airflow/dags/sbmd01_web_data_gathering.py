@@ -17,7 +17,7 @@ default_args = {
         "sla": timedelta(minutes=59)
         }
 
-def wait(n=300):
+def wait(n=240):
     time.sleep(n)
 
 dag = DAG("sbmd01_web_data_gathering",
