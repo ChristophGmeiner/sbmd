@@ -23,7 +23,7 @@ for lf in logfiles:
         pre_list = f.readlines()
     preerrorlist = []
     for p in pre_list:
-        if p.lower().find("error:") > -1:
+        if p.lower().find("error:") > -1 or p.lower().find("error -") > -1:
             preerrorlist.append(p)
         if preerrorlist:
             errordict[lf] = preerrorlist
