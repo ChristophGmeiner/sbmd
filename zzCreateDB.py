@@ -14,7 +14,7 @@ class Printer():
         sys.stdout.flush()
 
 config = configparser.ConfigParser()
-config.read("/home/ubuntu/dwh.cfg")
+config.read("/home/ubuntu/sbmd/dwh.cfg")
 
 rdsid = config['RDS']['ID1']
 rdspw = config["RDS"]["PW"]
