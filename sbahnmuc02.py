@@ -85,6 +85,13 @@ def main():
     real_stations.remove("Steinebach an der Wied Ort")
     real_stations.remove('Mittenwalde b Templin Dorf')
     real_stations.remove("Haarhausen")
+    
+    add_stats = ["Puchheim Bahnhof Alpenstraße, Puchheim", 
+                 "Bahnhofstraße, Eichenau", "Buchenau, Fürstenfeldbruck",
+                 "Bahnhof, Olching", "Am Zillerhof, Gröbenzell"]
+    
+    for add in add_stats:
+        real_stations.append(add)
                 
     stations_iter = itertools.combinations(real_stations, 2)
     
