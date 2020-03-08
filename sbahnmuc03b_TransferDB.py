@@ -5,9 +5,6 @@ import os
 import s3fs
 import json
 import pytictoc
-import psycopg2
-import io
-from sqlalchemy import create_engine
 import datetime
 import logging
 
@@ -64,9 +61,7 @@ dest = s3res.Object(BUCKET, archivfoldername + copy_source["Key"])
 dest.copy(CopySource=copy_source)
 response = s3res.Object(BUCKET, s3r_files[0]).delete()
 
-logging.info("Finished first line")
-
-df_list = []
+logging.info("Finished first line of df")
 
 for file in s3r_files[1:]:
     result = client.get_object(Bucket=BUCKET, Key=file) 
@@ -82,52 +77,21 @@ for file in s3r_files[1:]:
 
 logging.info("Finished whole DF and file")
 
-try: 
-    conn = psycopg2.connect(
-            host="sbmd.cfv4eklkdk8x.eu-central-1.rds.amazonaws.com", 
-            dbname="sbmd1", port=5432, user="sbmdmaster", password=rdspw)
+coln = list(base_df.columns)
+coln = [x.lower() for x in coln]
+base_df.columns = coln
 
-    cur = conn.cursor()
+base_df_filename = str(datetime.date.today()) + "_DB_DF.csv"
+base_df.to_csv("/home/ubuntu/sbmd/" + base_df_filename, index=False)
 
-    output = io.StringIO()
-    base_df.to_csv(output, sep='\t', header=False, index=False)
-    output.seek(0)
-    contents = output.getvalue()
+s3object = s3res.Object(BUCKET, "CSVs/" + base_df_filename)
+s3object.upload_file("/home/ubuntu/sbmd/" + base_df_filename)
+os.remove("/home/ubuntu/sbmd/" + base_df_filename)
 
-    constring = "postgresql+psycopg2://sbmdmaster:" +rdspw + \
-                "@sbmd.cfv4eklkdk8x.eu-central-1.rds.amazonaws.com:5432/sbmd1"
-    engine = create_engine(constring)
-    base_df.head(0).to_sql('t_db01_stagings', engine, if_exists='replace', 
-                            index=False)
+logging.info("Finished Copy, starting data quality checks")
 
-    coln = list(base_df.columns)
-    coln = [x.lower() for x in coln]
-    base_df.columns = coln
-
-    cur.copy_from(output, 't_db01_stagings', null="") # null values become ''
-    conn.commit()
-    conn.close()
-
-    logging.info("Finished Copy, starting data quality checks")
-    
-    if (len(s3r_files) != base_df.shape[0]):
-        logging.error("Data Quality check failed! Files and DF length not \
-                      identical!")
-        
-        base_df_filename = str(datetime.date.today()) + "_DB_DF.csv"
-        base_df.to_csv("/home/ubuntu/sbmd/" + base_df_filename, index=False)
-        today = str(datetime.date.today())
-        logging.info(f"DB CSV created for upload from {today}")
-        logging.error("Copy failed!")        
-    
-except Exception as e:
-    base_df_filename = str(datetime.date.today()) + "_DB_DF.csv"
-    base_df.to_csv("/home/ubuntu/sbmd/" + base_df_filename, index=False)
-    today = str(datetime.date.today())
-    logging.info(f"DB CSV created for upload from {today}")
-    logging.error("Copy failed!")
-    logging.error(e)
-
-#stop in 05 transfer
+if (len(s3r_files) != base_df.shape[0]):
+    logging.error("Data Quality check failed! Files and DF length not \
+                  identical!")
 
 t.toc()

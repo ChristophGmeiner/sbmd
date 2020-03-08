@@ -75,26 +75,21 @@ for file in s3r_files[1:]:
     
 logging.info("Finished DF")
 
-try:
-    constring = "postgresql+psycopg2://sbmdmaster:" +rdspw + \
-                "@sbmd.cfv4eklkdk8x.eu-central-1.rds.amazonaws.com:5432/sbmd1"
-    engine = create_engine(constring)
+coln = list(base_df.columns)
+coln = [x.lower() for x in coln]
+base_df.columns = coln
 
-    coln = list(base_df.columns)
-    coln = [x.lower() for x in coln]
-    base_df.columns = coln
+base_df_filename = str(datetime.date.today()) + "_Weather_DF.csv"
+base_df.to_csv("/home/ubuntu/sbmd/" + base_df_filename, index=False)
 
-    base_df.to_sql('t_w01_stagings', engine, if_exists='replace', 
-                            index=False)
+s3object = s3res.Object(BUCKET, "CSVs/" + base_df_filename)
+s3object.upload_file("/home/ubuntu/sbmd/" + base_df_filename)
+os.remove("/home/ubuntu/sbmd/" + base_df_filename)
+
+if (len(s3r_files) != base_df.shape[0]):
+    logging.error("Data Quality check failed! Files and DF length not \
+                  identical!")
     
-    logging.info("Finished Copy")
-
-except Exception as e:
-    base_df_filename = str(datetime.date.today()) + "_Weather_DF.csv"
-    base_df.to_csv("/home/ubuntu/sbmd/" + base_df_filename, index=False)
-    today = str(datetime.date.today())
-    logging.info(f"Weather CSV created for upload from {today}")
-    logging.error("Copy failed!")
-    logging.error(e)
+logging.info("Finished Copy")
 
 t.toc()
