@@ -8,12 +8,7 @@ import helpers
 # Defining the plugin class
 class UdacityPlugin(AirflowPlugin):
     name = "sbmd_plugins"
-    #operators = [
-    #    operators.StageToRedshiftOperator,
-    #    operators.LoadFactOperator,
-    #    operators.LoadDimensionOperator,
-    #    operators.DataQualityOperator
-    #]
+
     helpers = [
         helpers.CreateTables,
         helpers.InsertTables
