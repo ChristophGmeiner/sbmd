@@ -34,8 +34,8 @@ class CreateTables:
                     duration_text VARCHAR, duration_value FLOAT, \
                     distance_traffic_text VARCHAR, \
                     distance_traffic_value FLOAT)"
-    create_table2_index = createuniqueindsql + table2 + "_Index ON " +  \ 
-                          table2 + " (timestamp, start_loc, end_loc)"
+    create_table2_index = createuniqueindsql + table2 + "_Index ON " \
+                          + table2 + " (timestamp, start_loc, end_loc)"
     
     
     create_table3 = createsql + table3 + " (weather_id SERIAL PRIMARY KEY, \
