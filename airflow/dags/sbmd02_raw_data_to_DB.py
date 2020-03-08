@@ -14,7 +14,7 @@ default_args = {
         "email": "christoph.gmeiner@gmail.com",
         "email_on_retry": True,
         "email_on_success": True,
-	"email_on_failure": False,
+        "email_on_failure": False,
         "depends_on_past": False
         }
 
@@ -23,7 +23,7 @@ dag = DAG("sbmd02rawdatatoDB",
           default_args=default_args,
           schedule_interval="1 0 * * 1",
           max_active_runs=1,
-	  catchup=False)
+          chup=False)
 
 create_DB_task = BashOperator(
         task_id="02_create_DB_task",
@@ -35,7 +35,8 @@ drop_stage_tables = PostgresOperator(
         sql=CreateTables.drop_table1 + CreateTables.drop_table2 + \
             CreateTables.drop_table3,
         postgres_conn_id="postgres_aws_capstone",
-        autocommit=True)
+        autocommit=True,
+        dag=dag)
 
 load_train_data = BashOperator(
         task_id="01a_Load_train_Data",
@@ -60,7 +61,9 @@ transfer_train_data = S3ToRedshiftTransfer(
         s3_key="CSV2/" + str(date.today()) + "_DB_DF.csv",
         redshift_conn_id="postgres_aws_capstone",
         aws_conn_id="aws_credentials_s3",
-        autocommit=True
+        autocommit=True,
+        trigger_rule="all_done",
+        dag=dag
         )
 
 transfer_gmap_data = S3ToRedshiftTransfer(
@@ -71,7 +74,9 @@ transfer_gmap_data = S3ToRedshiftTransfer(
         s3_key="CSV2/" + str(date.today()) + "_Gmap_DF.csv",
         redshift_conn_id="postgres_aws_capstone",
         aws_conn_id="aws_credentials_s3",
-        autocommit=True
+        autocommit=True,
+        trigger_rule="all_done",
+        dag=dag
         )
 
 transfer_weather_data = S3ToRedshiftTransfer(
@@ -82,26 +87,34 @@ transfer_weather_data = S3ToRedshiftTransfer(
         s3_key="CSV2/" + str(date.today()) + "_Weather_DF.csv",
         redshift_conn_id="postgres_aws_capstone",
         aws_conn_id="aws_credentials_s3",
-        autocommit=True
+        autocommit=True,
+        trigger_rule="all_done",
+        dag=dag
         )
 
 insert_live_train_data = PostgresOperator(
         task_id="05a_Insert_Train_Live_Tables",
         sql=InsertTables.delsql1 + " " + InsertTables.inssql1,
         postgres_conn_id="postgres_aws_capstone",
-        autocommit=True)
+        autocommit=True,
+        trigger_rule="all_done",
+        dag=dag)
 
 insert_live_gmap_data = PostgresOperator(
         task_id="05b_Insert_Gmap_Live_Tables",
         sql=InsertTables.delsql2 + " " + InsertTables.inssql2,
         postgres_conn_id="postgres_aws_capstone",
-        autocommit=True)
+        autocommit=True,
+        trigger_rule="all_done",
+        dag=dag)
 
 insert_live_weather_data = PostgresOperator(
         task_id="05c_Insert_Weather_Live_Tables",
         sql=InsertTables.delsql3 + " " + InsertTables.inssql3,
         postgres_conn_id="postgres_aws_capstone",
-        autocommit=True)
+        autocommit=True,
+        trigger_rule="all_done",
+        dag=dag)
 
 archive_del_db = BashOperator(
         task_id="05b_Archive_and_Delete_DB",
