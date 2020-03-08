@@ -3,6 +3,7 @@ import configparser
 import os
 import sys
 from datetime import datetime
+import logging
 
 class Printer():
     """Print things to stdout on one line dynamically"""
@@ -34,6 +35,11 @@ dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
 dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
 
 while dbstate:
-    dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
-    dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
-    Printer(dbstate)
+    try:
+        dbdesc = client.describe_db_instances(DBInstanceIdentifier=rdsid)
+        dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
+        Printer(dbstate)
+        
+    except Exception as e:
+        logging.info(e)
+        logging.info("DB deletd")
