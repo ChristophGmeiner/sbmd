@@ -23,7 +23,7 @@ dag = DAG("sbmd02rawdatatoDB",
           default_args=default_args,
           schedule_interval="1 0 * * 1",
           max_active_runs=1,
-          chup=False)
+          catchup=False)
 
 create_DB_task = BashOperator(
         task_id="02_create_DB_task",
