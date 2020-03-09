@@ -9,10 +9,8 @@ from helpers import InsertTables
 default_args = {
         "owner": "Christoph Gmeiner",
         "start_date": datetime(2020, 3, 9, 0, 1),
-        "retries": 2,
-        "retry_delay": timedelta(seconds=100),
+        "retries": 0,
         "email": "christoph.gmeiner@gmail.com",
-        "email_on_retry": True,
         "email_on_success": True,
         "email_on_failure": False,
         "depends_on_past": False
