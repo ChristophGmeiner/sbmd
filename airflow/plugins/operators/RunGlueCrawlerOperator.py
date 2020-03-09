@@ -11,7 +11,7 @@ class Printer():
         sys.stdout.write("\r\x1b[K"+data.__str__())
         sys.stdout.flush()
         
-class RunGlueCrawlerOperatror(BaseOperator):
+class RunGlueCrawlerOperator(BaseOperator):
     ui_color = "#358140"
     
     @apply_defaults
@@ -27,7 +27,7 @@ class RunGlueCrawlerOperatror(BaseOperator):
         :crawler - name of the AWS Glue crawler
         '''
         
-        super(RunGlueCrawlerOperatror, self).__init__(*args, **kwargs)
+        super(RunGlueCrawlerOperator, self).__init__(*args, **kwargs)
         self.aws_creds = aws_creds
         self.region_name = region_name
         self.crawler = crawler

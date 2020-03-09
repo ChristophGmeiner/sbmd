@@ -1,6 +1,6 @@
-from operators.RunGlueCrawlerOperators import RunGlueCrawlerOperators
+from operators.RunGlueCrawlerOperator import RunGlueCrawlerOperator
 
 __all__ = [
-    'RunGlueCrawlerOperators'
+    'RunGlueCrawlerOperator'
    ]
 

@@ -3,7 +3,7 @@ from datetime import datetime, date, timedelta
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.s3_to_redshift_operator import S3ToRedshiftTransfer
-from airflow.operators import RunGlueCrawlerOperator
+from airflow.operators.RunGlueCrawlerOperator import RunGlueCrawlerOperator
 from helpers import CreateTables
 from helpers import InsertTables
 

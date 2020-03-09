@@ -9,7 +9,7 @@ import helpers
 class UdacityPlugin(AirflowPlugin):
     name = "sbmd_plugins"
     operators = [
-            operators.RunGlueCrawler
+            operators.RunGlueCrawlerOperator
             ]
     helpers = [
         helpers.CreateTables,
