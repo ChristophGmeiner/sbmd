@@ -47,7 +47,7 @@ In the long run, one could think about making individual operators for these pur
 
 In parallel also the Airflow DAG below runs every hour on minute 40. This dag is gathering the data again in reversed order. This way I can manage the gather more data in shorter time.
 
-![][sbmd_dag01b.png]
+![](sbmd_dag01b.png)
 
 I chose S3 and the json format, since it is the most natural way to store this data (since the API request result in single a single json file per record). In this way the raw data can be stored flexible and marked accordingly when loaded to the database. Therfore I have perfect control, what data was already loaded, what was not yet loaded and when what was loaded.
 Also concerning costs it is - according to my current knowledge - the most sufficient way for this process.
