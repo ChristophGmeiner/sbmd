@@ -1,8 +1,9 @@
 from airflow import DAG
-from datetime import datetime, timedelta, date
+from datetime import datetime, date, timedelta
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.s3_to_redshift_operator import S3ToRedshiftTransfer
+from airflow.operators import RunGlueCrawlerOperator
 from helpers import CreateTables
 from helpers import InsertTables
 
@@ -26,6 +27,7 @@ dag = DAG("sbmd02rawdatatoDB",
 create_DB_task = BashOperator(
         task_id="02_create_DB_task",
         bash_command=" python3 /home/ubuntu/sbmd/zzCreateDB.py",
+        sla=timedelta(minutes=15),
         dag=dag)
 
 drop_stage_tables = PostgresOperator(
@@ -116,21 +118,33 @@ insert_live_weather_data = PostgresOperator(
 
 archive_del_db = BashOperator(
         task_id="06bArchive_and_Delete_DB",
-        bash_command="python3 /home/ubuntu/sbmd/zzDelDB.py without",
+        bash_command="python3 /home/ubuntu/sbmd/zzDelDB.py with",
         trigger_rule="all_done",
+        sla=timedelta(minutes=15),
         dag=dag)
 
 archiv_del_db_fail = BashOperator(
         task_id="zz_Archive_and_Delete_DB_FailCase",
-        bash_command="python3 /home/ubuntu/sbmd/zzDelDB.py with",
+        bash_command="python3 /home/ubuntu/sbmd/zzDelDB.py without",
         trigger_rule="one_failed",
+        sla=timedelta(minutes=15),
         dag=dag)
+
+startglue_task = RunGlueCrawlerOperator(
+        task_id="zz_StartGlueCrawler",
+        region_name="eu-central-1",
+        crawler="sbmd"
+        )
 
 ##add glue job afterwards
 
 load_train_data >> create_DB_task
 load_gmap_data >> create_DB_task
 load_weather_data >> create_DB_task
+
+load_train_data >> startglue_task
+load_gmap_data >> startglue_task
+load_weather_data >> startglue_task
 
 create_DB_task >> drop_stage_tables
 

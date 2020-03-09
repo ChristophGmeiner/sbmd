@@ -8,7 +8,9 @@ import helpers
 # Defining the plugin class
 class UdacityPlugin(AirflowPlugin):
     name = "sbmd_plugins"
-
+    operators = [
+            operators.RunGlueCrawler
+            ]
     helpers = [
         helpers.CreateTables,
         helpers.InsertTables
