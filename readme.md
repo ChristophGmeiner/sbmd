@@ -88,7 +88,7 @@ After this has finished, the database will be saved in a snapshot and deleted ag
 
 This process is carried out once a week and triggered via Apache Airflow on the same EC2 as for the data gathering process. Please see the DAG below:
 
-![](sbmd_dag02.png)
+![](sbmd_dag02b.png)
 
 Also this dag consists only of BashOperators calling the relevant Python scripts (see below) and runs approx. for three hours. It is triggered once a week.
 In the long run, one could think about making individual operators for these purposes.
