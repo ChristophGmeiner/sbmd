@@ -5,7 +5,7 @@ import configparser
 def dearchive(BUCKET,
               archivname,
               index,
-              cfg="/home/ubuntu/sbmd/dwh.cfg"):
+              cfg="dwh.cfg"):
     '''
     dearchives failed archives
     :BUCKET: relevant S3 bucket
@@ -35,10 +35,13 @@ def dearchive(BUCKET,
     
     s3r_files = s3r_files[1:]
     
-    for file in s3r_files[1:]:
+    for file in s3r_files:
         #archiving back
         copy_source = {"Bucket": BUCKET, "Key": file}
         dest = s3res.Object(BUCKET, file[index:])
         dest.copy(CopySource=copy_source)
         response = s3res.Object(BUCKET, file).delete()
+    
+    response = s3res.Object(BUCKET, archivname[0:archivname.find("/")])\
+                    .delete()
 
