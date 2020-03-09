@@ -42,6 +42,5 @@ def dearchive(BUCKET,
         dest.copy(CopySource=copy_source)
         response = s3res.Object(BUCKET, file).delete()
     
-    response = s3res.Object(BUCKET, archivname[0:archivname.find("/")])\
-                    .delete()
+    response = s3res.Object(BUCKET, archivname).delete()
 
