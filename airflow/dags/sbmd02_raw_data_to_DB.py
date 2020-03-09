@@ -8,7 +8,7 @@ from helpers import InsertTables
 
 default_args = {
         "owner": "Christoph Gmeiner",
-        "start_date": datetime(2020, 3, 9, 0, 1),
+        "start_date": datetime(2020, 3, 2, 7, 1),
         "retries": 2,
         "retry_delay": timedelta(seconds=100),
         "email": "christoph.gmeiner@gmail.com",
@@ -21,7 +21,7 @@ default_args = {
 dag = DAG("sbmd02rawdatatoDB",
           description="Creates DBs and loads raw data from S3 to Postgres DB",
           default_args=default_args,
-          schedule_interval="1 0 * * 1",
+          schedule_interval="1 7 * * 1",
           max_active_runs=1,
           catchup=False)
 
