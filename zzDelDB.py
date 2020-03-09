@@ -24,10 +24,21 @@ client = boto3.client("rds", region_name="eu-central-1")
 snn_base = "sbmd-final-snapshot"
 snn = snn_base + "-" + datetime.now().strftime("%y-%m-%d-%H-%M")
 
-response = client.delete_db_instance(
+#steer whether do create a final snappshot on delete
+if sys.argv[1] == "with":
+
+    response = client.delete_db_instance(
+            DBInstanceIdentifier=rdsid,
+            SkipFinalSnapshot=False,
+            FinalDBSnapshotIdentifier=snn,
+            DeleteAutomatedBackups=True
+            )
+
+else:
+    
+    response = client.delete_db_instance(
         DBInstanceIdentifier=rdsid,
-        SkipFinalSnapshot=False,
-        FinalDBSnapshotIdentifier=snn,
+        SkipFinalSnapshot=True,
         DeleteAutomatedBackups=True
         )
         

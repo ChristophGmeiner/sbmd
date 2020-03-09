@@ -117,9 +117,15 @@ insert_live_weather_data = PostgresOperator(
         dag=dag)
 
 archive_del_db = BashOperator(
-        task_id="05b_Archive_and_Delete_DB",
-        bash_command="python3 /home/ubuntu/sbmd/zzDelDB.py",
+        task_id="06bArchive_and_Delete_DB",
+        bash_command="python3 /home/ubuntu/sbmd/zzDelDB.py without",
         trigger_rule="all_done",
+        dag=dag)
+
+archiv_del_db_fail = BashOperator(
+        task_id="zz_Archive_and_Delete_DB_FailCase",
+        bash_command="python3 /home/ubuntu/sbmd/zzDelDB.py with",
+        trigger_rule="one_failed",
         dag=dag)
 
 ##add glue job afterwards
@@ -141,3 +147,13 @@ transfer_weather_data >> insert_live_weather_data
 insert_live_train_data >> archive_del_db
 insert_live_gmap_data >> archive_del_db
 insert_live_weather_data >> archive_del_db
+
+#failover part
+
+drop_stage_tables >> archiv_del_db_fail
+drop_stage_tables >> archiv_del_db_fail
+drop_stage_tables >> archiv_del_db_fail
+
+transfer_train_data >> archiv_del_db_fail
+transfer_gmap_data >> archiv_del_db_fail
+transfer_weather_data >> archiv_del_db_fail
