@@ -8,11 +8,8 @@ from helpers import InsertTables
 
 default_args = {
         "owner": "Christoph Gmeiner",
-<<<<<<< HEAD
-=======
-        "start_date": datetime(2020, 3, 9, 0, 1),
+        "start_date": datetime(2020, 3, 2, 7, 1),
         "retries": 0,
->>>>>>> 83c4ede7f9fbcdef34265ea9304a7d2b202ab26c
         "email": "christoph.gmeiner@gmail.com",
         "email_on_success": True,
         "email_on_failure": False,
