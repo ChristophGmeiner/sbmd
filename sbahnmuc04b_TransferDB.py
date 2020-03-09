@@ -85,7 +85,7 @@ coln = [x.lower() for x in coln]
 base_df.columns = coln
 
 base_df_filename = str(datetime.date.today()) + "_Gmap_DF.csv"
-base_df.to_csv("/home/uubuntu/sbmd/" + base_df_filename, index=False)
+base_df.to_csv("/home/ubuntu/sbmd/" + base_df_filename, index=False)
 
 s3object = s3res.Object(BUCKET, "CSVs/" + base_df_filename)
 s3object.upload_file("/home/ubuntu/sbmd/" + base_df_filename)
