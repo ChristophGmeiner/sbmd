@@ -3,7 +3,7 @@ from datetime import datetime, date, timedelta
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.s3_to_redshift_operator import S3ToRedshiftTransfer
-from airflow.operators.RunGlueCrawlerOperator import RunGlueCrawlerOperator
+from airflow.operators import RunGlueCrawlerOperator
 from helpers import InsertTables
 
 default_args = {
@@ -135,8 +135,8 @@ archiv_del_db_fail = BashOperator(
 startglue_task = RunGlueCrawlerOperator(
         task_id="zz_StartGlueCrawler",
         region_name="eu-central-1",
-        crawler="sbmd"
-        )
+        crawler="sbmd",
+        dag=dag)
 
 ##add glue job afterwards
 

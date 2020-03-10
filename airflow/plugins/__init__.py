@@ -6,8 +6,8 @@ import operators
 import helpers
 
 # Defining the plugin class
-class UdacityPlugin(AirflowPlugin):
-    name = "sbmd_plugins"
+class sbmd_plugin(AirflowPlugin):
+    name = "sbmd_plugin"
     operators = [
             operators.RunGlueCrawlerOperator,
             operators.ModifyRDSPostgres,
