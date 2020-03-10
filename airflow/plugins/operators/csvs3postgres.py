@@ -46,20 +46,20 @@ class CSV_S3_PostgresOperator(BaseOperator):
         self.s3_key = s3_key,
         self.s3_region = s3_region
         
-        def execute(self, context):
-            aws_hook = AwsHook(self.aws_creds)
-            creds = aws_hook.get_credentials()
-            pg_hook = PostgresHook(postgress_conn_id="postgres_aws_capstone")
-            
-            self.log.info("Start copying...")
-            
-            s3_path = "s3://" + self.s3_bucket + "/" + self.s3_key
-            formated_sql = CSV_S3_PostgresOperator.copy_sql.format(
-                    self.table,
-                    s3_path,
-                    creds.access_key,
-                    creds.secret_key,
-                    self.s3_region)
-            pg_hook.run(formated_sql)
-            
-            self.log.info("Successfully copied!")
+    def execute(self, context):
+        aws_hook = AwsHook(self.aws_creds)
+        creds = aws_hook.get_credentials()
+        pg_hook = PostgresHook(postgress_conn_id="postgres_aws_capstone")
+        
+        self.log.info("Start copying...")
+        
+        s3_path = "s3://" + self.s3_bucket + "/" + self.s3_key
+        formated_sql = CSV_S3_PostgresOperator.copy_sql.format(
+                self.table,
+                s3_path,
+                creds.access_key,
+                creds.secret_key,
+                self.s3_region)
+        pg_hook.run(formated_sql)
+        
+        self.log.info("Successfully copied!")

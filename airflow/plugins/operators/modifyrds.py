@@ -49,106 +49,106 @@ class ModifyRDSPostgres(BaseOperator):
         self.Port = Port
         self.Engine = Engine
         
-        def execute(self, context):
-            
-            utc=pytz.UTC
+    def execute(self, context):
+        
+        utc=pytz.UTC
 
-            rds_hook = AwsHook(self.rds_conn_id)
-            rdscreds = rds_hook.get_credentials()
+        rds_hook = AwsHook(self.rds_conn_id)
+        rdscreds = rds_hook.get_credentials()
+        
+        vpc_hook = AwsHook(self.VpcSID)
+        vpccreds = vpc_hook.get_credentials()
+        
+        client = boto3.client("rds", region_name=self.region_name)
+        
+        rdsid = rdscreds.access_key
+        snn_base = "sbmd-final-snapshot"
+        snn = snn_base + datetime.now().strftime("%y-%m-%d-%H-%M")  
+       
+        if self.modtype == "create":
+                            
+            existing_sn = client.describe_db_snapshots(
+                    DBInstandeIdentifier=rdsid)
+            esn_list = existing_sn["DBSnapshots"]
             
-            vpc_hook = AwsHook(self.VpcSID)
-            vpccreds = vpc_hook.get_credentials()
-            
-            client = boto3.client("rds", region_name=self.region_name)
-            
-            rdsid = rdscreds.access_key
-            snn_base = "sbmd-final-snapshot"
-            snn = snn_base + datetime.now().strftime("%y-%m-%d-%H-%M")  
-           
-            if self.modtype == "create":
-                                
-                existing_sn = client.describe_db_snapshots(
-                        DBInstandeIdentifier=rdsid)
-                esn_list = existing_sn["DBSnapshots"]
-                
-                final_esn_list = list()
-                final_esn_list.append("test")
-                final_esn_list.append(
-                        utc.localize(datetime.utcnow()
-                            - timedelta(weeks=1000)))
-                for s in esn_list:
-                    sn_name = s["DBSnapshotIdentifier"]
-                    sn_time = s["SnapshotCreateTime"]
+            final_esn_list = list()
+            final_esn_list.append("test")
+            final_esn_list.append(
+                    utc.localize(datetime.utcnow()
+                        - timedelta(weeks=1000)))
+            for s in esn_list:
+                sn_name = s["DBSnapshotIdentifier"]
+                sn_time = s["SnapshotCreateTime"]
 
-                    if sn_name.find(snn_base) > -1 and \
-                            sn_time > final_esn_list[1]:
-                        final_esn_list.pop()
-                        final_esn_list.pop()
-                        final_esn_list.append(sn_name)
-                        final_esn_list.append(sn_time)
-                    
-                response = client.restore_db_instance_from_db_snapshot(
-                        DBInstanceIdentifier=rdsid,
-                        DBSnapshotIdentifier=final_esn_list[0],
-                        DBInstanceClass=self.dbiclass,
-                        Port=self.Port,
-                        AvailabilityZone=self.azone,
-                        PubliclyAccessible=True,
-                        Engine=self.Engine,
-                        VpcSecurityGroupIds=[vpccreds.access_key],
-                        DeletionProtection=self.DelProtect)
+                if sn_name.find(snn_base) > -1 and \
+                        sn_time > final_esn_list[1]:
+                    final_esn_list.pop()
+                    final_esn_list.pop()
+                    final_esn_list.append(sn_name)
+                    final_esn_list.append(sn_time)
                 
+            response = client.restore_db_instance_from_db_snapshot(
+                    DBInstanceIdentifier=rdsid,
+                    DBSnapshotIdentifier=final_esn_list[0],
+                    DBInstanceClass=self.dbiclass,
+                    Port=self.Port,
+                    AvailabilityZone=self.azone,
+                    PubliclyAccessible=True,
+                    Engine=self.Engine,
+                    VpcSecurityGroupIds=[vpccreds.access_key],
+                    DeletionProtection=self.DelProtect)
+            
+            dbdesc = client.describe_db_instances(
+                    DBInstanceIdentifier=rdsid)
+            dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
+
+            while dbstate != "available":
                 dbdesc = client.describe_db_instances(
                         DBInstanceIdentifier=rdsid)
                 dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
+                
+            self.log.info("Succesfully created!")
+            
+        if self.modtype == "delete" and self.deltype == "with":
+               response = client.delete_db_instance(
+                    DBInstanceIdentifier=rdsid,
+                    SkipFinalSnapshot=False,
+                    FinalDBSnapshotIdentifier=snn,
+                    DeleteAutomatedBackups=True
+                    )
+               
+               dbdesc = client.describe_db_instances(
+                      DBInstanceIdentifier=rdsid)
+               dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
 
-                while dbstate != "available":
-                    dbdesc = client.describe_db_instances(
-                            DBInstanceIdentifier=rdsid)
-                    dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
+               while dbstate:
+                   try:
+                       dbdesc = client.describe_db_instances(
+                               DBInstanceIdentifier=rdsid)
+                       dbstate = dbdesc["DBInstances"][0]\
+                           ["DBInstanceStatus"]
+                   except Exception as e:
+                       self.log.info(e)
+                       self.log.info("DB deletd")
                     
-                self.log.info("Succesfully created!")
-                
-            if self.modtype == "delete" and self.deltype == "with":
-                   response = client.delete_db_instance(
-                        DBInstanceIdentifier=rdsid,
-                        SkipFinalSnapshot=False,
-                        FinalDBSnapshotIdentifier=snn,
-                        DeleteAutomatedBackups=True
-                        )
-                   
-                   dbdesc = client.describe_db_instances(
-                          DBInstanceIdentifier=rdsid)
-                   dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
+        if self.modtype == "delete" and self.deltype == "without":
+               response = client.delete_db_instance(
+                    DBInstanceIdentifier=rdsid,
+                    SkipFinalSnapshot=True,
+                    DeleteAutomatedBackups=True
+                    )
+               
+               dbdesc = client.describe_db_instances(
+                      DBInstanceIdentifier=rdsid)
+               dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
 
-                   while dbstate:
-                       try:
-                           dbdesc = client.describe_db_instances(
-                                   DBInstanceIdentifier=rdsid)
-                           dbstate = dbdesc["DBInstances"][0]\
-                               ["DBInstanceStatus"]
-                       except Exception as e:
-                           self.log.info(e)
-                           self.log.info("DB deletd")
-                        
-            if self.modtype == "delete" and self.deltype == "withou":
-                   response = client.delete_db_instance(
-                        DBInstanceIdentifier=rdsid,
-                        SkipFinalSnapshot=True,
-                        DeleteAutomatedBackups=True
-                        )
-                   
-                   dbdesc = client.describe_db_instances(
-                          DBInstanceIdentifier=rdsid)
-                   dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
-
-                   while dbstate:
-                       try:
-                           dbdesc = client.describe_db_instances(
-                                   DBInstanceIdentifier=rdsid)
-                           dbstate = dbdesc["DBInstances"][0]\
-                               ["DBInstanceStatus"]
-                       except Exception as e:
-                           self.log.info(e)
-                           self.log.info("DB deletd")                    
-                
+               while dbstate:
+                   try:
+                       dbdesc = client.describe_db_instances(
+                               DBInstanceIdentifier=rdsid)
+                       dbstate = dbdesc["DBInstances"][0]\
+                           ["DBInstanceStatus"]
+                   except Exception as e:
+                       self.log.info(e)
+                       self.log.info("DB deletd")                    
+            
