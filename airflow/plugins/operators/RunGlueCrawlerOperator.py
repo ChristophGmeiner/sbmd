@@ -1,15 +1,8 @@
 import boto3
-import sys
 import os
 from airflow.contrib.hooks.aws_hook import AwsHook
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
-
-class Printer():
-    """Print things to stdout on one line dynamically"""
-    def __init__(self,data):
-        sys.stdout.write("\r\x1b[K"+data.__str__())
-        sys.stdout.flush()
         
 class RunGlueCrawlerOperator(BaseOperator):
     ui_color = "#358140"
@@ -46,9 +39,12 @@ class RunGlueCrawlerOperator(BaseOperator):
             state = glue.get_crawler(Name=self.crawler)
             state = state["Crawler"]["State"]
             
+            self.log.info("Started Crawler...")
+            
             while state != "READY":
                 state = glue.get_crawler(Name=self.crawler)
                 state = state["Crawler"]["State"]
-                Printer(state)
+            
+            self.log.info(f"Crawler is {state}")
 
 

@@ -4,7 +4,6 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.s3_to_redshift_operator import S3ToRedshiftTransfer
 from airflow.operators.RunGlueCrawlerOperator import RunGlueCrawlerOperator
-from helpers import CreateTables
 from helpers import InsertTables
 
 default_args = {
@@ -32,8 +31,11 @@ create_DB_task = BashOperator(
 
 drop_stage_tables = PostgresOperator(
         task_id="03_Drop_Old_Stage_Tables",
-        sql=CreateTables.drop_table1 + CreateTables.drop_table2 + \
-            CreateTables.drop_table3,
+        sql="""
+            DROP TABLE IF EXISTS t_db01_stagings;
+            DROP TABLE IF EXISTS t_gmap01_stagings;
+            DROP TABLE OF EXISTS t_w01_stagings;
+            """,
         postgres_conn_id="postgres_aws_capstone",
         autocommit=True,
         dag=dag)
@@ -162,8 +164,6 @@ insert_live_weather_data >> archive_del_db
 
 #failover part
 
-drop_stage_tables >> archiv_del_db_fail
-drop_stage_tables >> archiv_del_db_fail
 drop_stage_tables >> archiv_del_db_fail
 
 transfer_train_data >> archiv_del_db_fail

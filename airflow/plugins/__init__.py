@@ -9,7 +9,9 @@ import helpers
 class UdacityPlugin(AirflowPlugin):
     name = "sbmd_plugins"
     operators = [
-            operators.RunGlueCrawlerOperator
+            operators.RunGlueCrawlerOperator,
+            operators.ModifyRDSPostgres,
+            operators.CSV_S3_PostgresOperator
             ]
     helpers = [
         helpers.CreateTables,
