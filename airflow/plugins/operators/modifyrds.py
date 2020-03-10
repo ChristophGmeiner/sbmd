@@ -1,6 +1,7 @@
 import boto3
 from datetime import datetime, timedelta
 import pytz
+import time
 from airflow.contrib.hooks.aws_hook import AwsHook
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
@@ -125,20 +126,7 @@ class ModifyRDSPostgres(BaseOperator):
                     FinalDBSnapshotIdentifier=snn,
                     DeleteAutomatedBackups=True
                     )
-               
-               dbdesc = client.describe_db_instances(
-                      DBInstanceIdentifier=rdsid)
-               dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
-
-               while dbstate:
-                   try:
-                       dbdesc = client.describe_db_instances(
-                               DBInstanceIdentifier=rdsid)
-                       dbstate = dbdesc["DBInstances"][0]\
-                           ["DBInstanceStatus"]
-                   except Exception as e:
-                       self.log.info(e)
-                       self.log.info("DB deletd")
+               time.sleep(600)
                     
         if self.modtype == "delete" and self.deltype == "without":
                response = client.delete_db_instance(
@@ -146,18 +134,4 @@ class ModifyRDSPostgres(BaseOperator):
                     SkipFinalSnapshot=True,
                     DeleteAutomatedBackups=True
                     )
-               
-               dbdesc = client.describe_db_instances(
-                      DBInstanceIdentifier=rdsid)
-               dbstate = dbdesc["DBInstances"][0]["DBInstanceStatus"]
-
-               while dbstate:
-                   try:
-                       dbdesc = client.describe_db_instances(
-                               DBInstanceIdentifier=rdsid)
-                       dbstate = dbdesc["DBInstances"][0]\
-                           ["DBInstanceStatus"]
-                   except Exception as e:
-                       self.log.info(e)
-                       self.log.info("DB deletd")                    
-            
+               time.sleep(600)
