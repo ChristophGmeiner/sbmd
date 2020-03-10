@@ -6,8 +6,6 @@ from airflow.utils.decorators import apply_defaults
 class CSV_S3_PostgresOperator(BaseOperator):
     ui_color = "#F98866"
     
-    template_fields = ("s3_key")
-    
     copy_sql = """
                     COPY {}
                     FROM '{}'
@@ -45,6 +43,9 @@ class CSV_S3_PostgresOperator(BaseOperator):
         self.s3_bucket = s3_bucket
         self.s3_key = s3_key,
         self.s3_region = s3_region
+        
+        if self.s3_key[-1] != "/":
+            self.s3_key = self.s3_key + "/"
         
     def execute(self, context):
         aws_hook = AwsHook(self.aws_creds)
