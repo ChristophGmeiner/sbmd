@@ -27,7 +27,7 @@ dag = DAG("test_sbmd02rawdatatoDB",
 
 create_DB_task = ModifyRDSPostgres(
         task_id="g02_create_DB_task",
-	aws_creds="aws_credentials_s3",
+        aws_creds="aws_credentials_s3",
         rds_conn_id="postgres_modify",
         modtype="create",
         deltype="",
@@ -59,8 +59,7 @@ transfer_gmap_data = CSV_S3_PostgresOperator(
         s3_bucket="sbmd2gmap3",
         s3_key="CSV",
         s3_region="eu_central-1",
-        dag=dag
-        )
+        dag=dag)
 
 insert_live_gmap_data = PostgresOperator(
         task_id="g05b_Insert_Gmap_Live_Tables",
@@ -73,7 +72,7 @@ insert_live_gmap_data = PostgresOperator(
 archive_del_db = ModifyRDSPostgres(
         task_id="g06bArchive_and_Delete_DB",
         rds_conn_id="postgres_modify",
-	aws_creds="aws_credentials_s3",
+        aws_creds="aws_credentials_s3",
         modtype="delete",
         deltype="with",
         VpcSID="postgres_sec_id",
@@ -82,7 +81,7 @@ archive_del_db = ModifyRDSPostgres(
 archiv_del_db_fail = ModifyRDSPostgres(
         task_id="g06bArchive_and_Delete_DB_FailCase",
         rds_conn_id="postgres_modify",
-	aws_creds="aws_credentials_s3",
+        aws_creds="aws_credentials_s3",
         modtype="delete",
         deltype="without",
         VpcSID="postgres_sec_id",
@@ -94,8 +93,7 @@ startglue_task = RunGlueCrawlerOperator(
         region_name="eu-central-1",
         aws_creds="aws_credentials_s3",
         crawler="sbmd",
-        dag=dag
-        )
+        dag=dag)
 
 archivecsv_task = ArchiveCSVS3(
         task_id="gzz_Archive_CSV_files",
