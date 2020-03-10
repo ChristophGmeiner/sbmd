@@ -57,7 +57,7 @@ class ModifyRDSPostgres(BaseOperator):
         utc=pytz.UTC
         
         aws_hook = AwsHook(self.aws_creds)
-        awscreds = aws_hook.get.credentials()
+        awscreds = aws_hook.get_credentials()
         
         rds_hook = AwsHook(self.rds_conn_id)
         rdscreds = rds_hook.get_credentials()
