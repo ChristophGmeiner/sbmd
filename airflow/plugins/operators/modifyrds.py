@@ -6,7 +6,7 @@ from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 
 class ModifyRDSPostgres(BaseOperator):
-    ui_color = "#358140"
+    ui_color = "8958140"
     
     @apply_defaults
     def __init__(self,
@@ -16,7 +16,7 @@ class ModifyRDSPostgres(BaseOperator):
                  dbiclass="db.m5.4xlarge",
                  azone="eu-central-1b",
                  region_name="eu-central-1",
-                 VpcSID="sg-00496c38f5351e4ea",
+                 VpcSID="",
                  DelProtect=False,
                  Port=5432,
                  Engine="postgres",
@@ -53,11 +53,11 @@ class ModifyRDSPostgres(BaseOperator):
             
             utc=pytz.UTC
 
-            rds_hook = AwsHook(self.aws_creds)
+            rds_hook = AwsHook(self.rds_conn_id)
             rdscreds = rds_hook.get_credentials()
             
             vpc_hook = AwsHook(self.VpcSID)
-            vpccreds = vpc_hok.get_credentials()
+            vpccreds = vpc_hook.get_credentials()
             
             client = boto3.client("rds", region_name=self.region_name)
             
