@@ -25,26 +25,26 @@ class RunGlueCrawlerOperator(BaseOperator):
         self.region_name = region_name
         self.crawler = crawler
         
-        def execute(self, context):
-            aws_hook = AwsHook(self.aws_creds)
-            creds = aws_hook.get_credentials()
-             
-            self.log.info("Initialising the glue client")
-            os.environ['AWS_ACCESS_KEY_ID']=creds.access_key
-            os.environ['AWS_SECRET_ACCESS_KEY']=creds.secret_key
-            
-            glue = boto3.client("glue", region_name=self.region_name)
-            glue.start_crawler(Name=self.crawler)
-            
+    def execute(self, context):
+        aws_hook = AwsHook(self.aws_creds)
+        creds = aws_hook.get_credentials()
+         
+        self.log.info("Initialising the glue client")
+        os.environ['AWS_ACCESS_KEY_ID']=creds.access_key
+        os.environ['AWS_SECRET_ACCESS_KEY']=creds.secret_key
+        
+        glue = boto3.client("glue", region_name=self.region_name)
+        glue.start_crawler(Name=self.crawler)
+        
+        state = glue.get_crawler(Name=self.crawler)
+        state = state["Crawler"]["State"]
+        
+        self.log.info("Started Crawler...")
+        
+        while state != "READY":
             state = glue.get_crawler(Name=self.crawler)
             state = state["Crawler"]["State"]
-            
-            self.log.info("Started Crawler...")
-            
-            while state != "READY":
-                state = glue.get_crawler(Name=self.crawler)
-                state = state["Crawler"]["State"]
-            
-            self.log.info(f"Crawler is {state}")
+        
+        self.log.info(f"Crawler is {state}")
 
 
