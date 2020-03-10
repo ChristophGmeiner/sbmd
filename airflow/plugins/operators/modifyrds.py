@@ -68,7 +68,7 @@ class ModifyRDSPostgres(BaseOperator):
         if self.modtype == "create":
                             
             existing_sn = client.describe_db_snapshots(
-                    DBInstandeIdentifier=rdsid)
+                    DBInstanceIdentifier=rdsid)
             esn_list = existing_sn["DBSnapshots"]
             
             final_esn_list = list()
