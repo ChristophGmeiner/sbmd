@@ -11,6 +11,7 @@ class ModifyRDSPostgres(BaseOperator):
     @apply_defaults
     def __init__(self,
                  rds_conn_id="",
+                 aws_creds="",
                  modtype="",
                  deltype="",
                  dbiclass="db.m5.4xlarge",
@@ -25,6 +26,7 @@ class ModifyRDSPostgres(BaseOperator):
         Initialises an AWS RDS client and creates (only from a snapshot or 
         deletes a RDS instance
         :rds_conn_id - Airflow conn ID of the database
+        :aws_creds - Credentials for accessing AWS
         :modtype - "create" or "delete"
         :deltype - "with" (snapshot) or "without"
         :dbiclass - Instance type
@@ -39,6 +41,7 @@ class ModifyRDSPostgres(BaseOperator):
         
         super(ModifyRDSPostgres, self).__init__(*args, **kwargs)
         self.rds_conn_id = rds_conn_id
+        self.aws_creds = aws_creds
         self.modtype = modtype
         self.deltype = deltype
         self.dbiclass = dbiclass
@@ -52,14 +55,20 @@ class ModifyRDSPostgres(BaseOperator):
     def execute(self, context):
         
         utc=pytz.UTC
-
+        
+        aws_hook = AwsHook(self.aws_creds)
+        awscreds = aws_hook.get.credentials()
+        
         rds_hook = AwsHook(self.rds_conn_id)
         rdscreds = rds_hook.get_credentials()
         
         vpc_hook = AwsHook(self.VpcSID)
         vpccreds = vpc_hook.get_credentials()
         
-        client = boto3.client("rds", region_name=self.region_name)
+        client = boto3.client("rds", 
+                              region_name=self.region_name,
+                               aws_access_key_id=awscreds.access_key,
+                               aws_secret_access_key=awscreds.secret_key)
         
         rdsid = rdscreds.access_key
         snn_base = "sbmd-final-snapshot"
