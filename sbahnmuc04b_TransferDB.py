@@ -4,7 +4,6 @@ import pandas as pd
 import os
 import json
 import pytictoc
-from sqlalchemy import create_engine
 import datetime
 import logging
 from DeArchive import dearchive
@@ -101,11 +100,17 @@ try:
     logging.info("Finished Copy")
     
 except Exception as e:
-    logging.error("Something went wrong...startind de-archiving!")
-    logging.error(e)
+            
+    if len(s3r_files) == 0:
+        print("Currently no files to load")
     
-    dearchive(BUCKET, archivfoldername, 22)
+    else:
     
-    logging.info("Succesfully dearchived!")
+        logging.error("Something went wrong...starting de-archiving!")
+        logging.error(e)
+        
+        dearchive(BUCKET, archivfoldername, 22)
+        
+        logging.info("Succesfully dearchived!")
 
 t.toc()
