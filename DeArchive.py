@@ -28,6 +28,9 @@ def dearchive(BUCKET,
     bucket = s3r.Bucket(BUCKET)
     objsr_all = bucket.objects.all()
     
+    if archivname.find("/") == -1:
+        archivname = archivname + "/"
+    
     s3r_files = []
     for o in objsr_all:
         if o.key.find(archivname) > -1:
