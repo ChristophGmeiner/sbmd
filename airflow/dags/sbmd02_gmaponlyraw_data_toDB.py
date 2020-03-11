@@ -1,8 +1,8 @@
 from airflow import DAG
-from datetime import datetime
+from datetime import datetime, timedelta
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.postgres_operator import PostgresOperator
-from airflow.operators.sbmd_plugin import RunGlueCrawlerOperator, 
+from airflow.operators.sbmd_plugin import RunGlueCrawlerOperator 
 from airflow.operators.s3_to_redshift_operator import S3ToRedshiftTransfer                            
 from airflow.operators.sbmd_plugin import ModifyRedshift
 from airflow.operators.sbmd_plugin import ArchiveCSVS3
@@ -10,25 +10,25 @@ from helpers import InsertTables
 
 default_args = {
         "owner": "Christoph Gmeiner",
-        "start_date": datetime(2020, 3, 4, 8, 10),
+        "start_date": datetime(2020, 3, 4, 9, 25),
         "retries": 0,
         "email": "christoph.gmeiner@gmail.com",
         "email_on_success": True,
-        "email_on_failure": False,
+        "email_on_failure":True,
         "depends_on_past": False
         }
 
 dag = DAG("test_sbmd02rawdatatoDB",
           description="Creates DBs and loads raw data from S3 to Postgres DB",
           default_args=default_args,
-          schedule_interval="10 8 * * 3",
+          schedule_interval="25 9 * * 3",
           max_active_runs=1,
           catchup=False)
 
 create_DB_task = ModifyRedshift(
         task_id="g02_create_DB_task",
         aws_creds="aws_credentials_s3",
-        rds_conn_id="redshift_modify",
+        r_conn_id="redshift_modify",
         modtype="create",
         deltype="",
         VpcSID ="postgres_sec_id",
@@ -43,6 +43,8 @@ drop_stage_tables = PostgresOperator(
             """,
         postgres_conn_id="redshift_aws_capstone",
         autocommit=True,
+	retries=2,
+	retry_delay=timedelta(seconds=200),
         dag=dag)
 
 load_gmap_data = BashOperator(
@@ -53,12 +55,14 @@ load_gmap_data = BashOperator(
 
 transfer_gmap_data = S3ToRedshiftTransfer(
         task_id="g04b_Transfer_gmap_CSV",
-        schema=sbmd1,
+        schema="public",
+	table="t_gmap01_stagings",
         s3_bucket="sbmd2gmap3",
         s3_key="CSV/",
         redshift_conn_id="redshift_aws_capstone",
         autocommit=True,
-        dag=dag)
+        aws_conn_id="aws_credentials_s3",
+	dag=dag)
 
 insert_live_gmap_data = PostgresOperator(
         task_id="g05b_Insert_Gmap_Live_Tables",
@@ -68,23 +72,27 @@ insert_live_gmap_data = PostgresOperator(
         dag=dag)
 
 
-archive_del_db = ModifyRDSPostgres(
+archive_del_db = ModifyRedshift(
         task_id="g06bArchive_and_Delete_DB",
-        rds_conn_id="redshift_modify",
+        r_conn_id="redshift_modify",
         aws_creds="aws_credentials_s3",
         modtype="delete",
         deltype="with",
         VpcSID="postgres_sec_id",
+	retries=2,
+	retry_delay=timedelta(seconds=300),
         dag=dag)
 
-archiv_del_db_fail = ModifyRDSPostgres(
+archiv_del_db_fail = ModifyRedshift(
         task_id="g06bArchive_and_Delete_DB_FailCase",
-        rds_conn_id="redshift_modify",
+        r_conn_id="redshift_modify",
         aws_creds="aws_credentials_s3",
         modtype="delete",
         deltype="without",
         VpcSID="postgres_sec_id",
         trigger_rule="one_failed",
+	retries=2,
+	retry_delay=timedelta(seconds=300),
         dag=dag)
 
 startglue_task = RunGlueCrawlerOperator(
@@ -92,6 +100,8 @@ startglue_task = RunGlueCrawlerOperator(
         region_name="eu-central-1",
         aws_creds="aws_credentials_s3",
         crawler="sbmd",
+	retries=2,
+	retry_delay=timedelta(seconds=300),
         dag=dag)
 
 archivecsv_task = ArchiveCSVS3(
