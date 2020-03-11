@@ -3,7 +3,7 @@ import os
 import configparser
 
 def dearchive(BUCKET,
-              archivname,
+              archives,
               index,
               cfg="/home/ubuntu(sbmd/dwh.cfg"):
     '''
@@ -28,22 +28,24 @@ def dearchive(BUCKET,
     bucket = s3r.Bucket(BUCKET)
     objsr_all = bucket.objects.all()
     
-    if archivname.find("/") == -1:
-        archivname = archivname + "/"
+    for archivname in archives:
     
-    s3r_files = []
-    for o in objsr_all:
-        if o.key.find(archivname) > -1:
-            s3r_files.append(o.key)
-    
-    s3r_files = s3r_files[1:]
-    
-    for file in s3r_files:
-        #archiving back
-        copy_source = {"Bucket": BUCKET, "Key": file}
-        dest = s3res.Object(BUCKET, file[index:])
-        dest.copy(CopySource=copy_source)
-        response = s3res.Object(BUCKET, file).delete()
-    
-    response = s3res.Object(BUCKET, archivname).delete()
+        if archivname.find("/") == -1:
+            archivname = archivname + "/"
+        
+        s3r_files = []
+        for o in objsr_all:
+            if o.key.find(archivname) > -1:
+                s3r_files.append(o.key)
+        
+        s3r_files = s3r_files[1:]
+        
+        for file in s3r_files:
+            #archiving back
+            copy_source = {"Bucket": BUCKET, "Key": file}
+            dest = s3res.Object(BUCKET, file[index:])
+            dest.copy(CopySource=copy_source)
+            response = s3res.Object(BUCKET, file).delete()
+        
+        response = s3res.Object(BUCKET, archivname).delete()
 
