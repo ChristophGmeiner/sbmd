@@ -49,8 +49,8 @@ class InsertTables:
                 "start",
                 "end",
                 CAST("timestamp" AS TIMESTAMP),
-                TO_TIMESTAMP(departure, 'HH24:MI')::TIME AS departure,
-                TO_TIMESTAMP(arrival, 'HH24:MI')::TIME AS arrival,
+                TO_TIMESTAMP("date" || departure, '%y-%m-%d HH24:MI')::TIME AS departure,
+                TO_TIMESTAMP("date" || arrival, '%y-%m-%d HH24:MI')::TIME AS arrival,
                 transfers,
                 TO_TIMESTAMP(arrival, 'HH24:MI')::TIME - TO_TIMESTAMP(departure, 'HH24:MI')::TIME,
                 products,
@@ -80,8 +80,8 @@ class InsertTables:
                 distance_value, 
                 duration_text, 
                 duration_value, 
-                distance_traffic_text, 
-                distance_traffic_value)
+                duration_in_traffic_text, 
+                duration_in_traffic_value
             SELECT DISTINCT
                 stat1,
                 stat2,
@@ -90,7 +90,7 @@ class InsertTables:
                 start_location_lng,
                 start_address,
                 end_location_lat,
-                end_location_lng,
+                end_location_lat,
                 end_address,
                 distance_text,
                 distance_value,

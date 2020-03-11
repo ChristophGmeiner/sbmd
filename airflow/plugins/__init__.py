@@ -12,6 +12,7 @@ class sbmd_plugin(AirflowPlugin):
             operators.RunGlueCrawlerOperator,
             operators.ModifyRDSPostgres,
             operators.CSV_S3_PostgresOperator,
+            operators.ModifyRedshift,
             operators.ArchiveCSVS3
             ]
     helpers = [
