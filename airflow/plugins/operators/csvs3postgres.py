@@ -53,7 +53,7 @@ class CSV_S3_PostgresOperator(BaseOperator):
 
         aws_hook = AwsHook(self.aws_creds)
         creds = aws_hook.get_credentials()
-        pg_hook = PostgresHook(postgress_conn_id="postgres_aws_capstone")
+        pg_hook = PostgresHook(postgres_conn_id=self.postgres_conn_id)
         
         self.log.info("Start copying...")
         
