@@ -5,6 +5,7 @@ from airflow.contrib.hooks.aws_hook import AwsHook
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 import pytz
+import sys
 
 utc=pytz.UTC
 
@@ -66,43 +67,54 @@ class ModifyRedshift(BaseOperator):
         snn = snn_base + datetime.now().strftime("%y-%m-%d-%H-%M")  
        
         if self.modtype == "create":
-                            
-            existing_sn = client.describe_cluster_snapshots(
-                                ClusterIdentifier=cid)
-            esn_list = existing_sn["DBSnapshots"]
             
-            final_esn_list = list()
-            final_esn_list.append("test")
-            final_esn_list.append(
-                    utc.localize(datetime.utcnow()
-                        - timedelta(weeks=1000)))
-            for s in esn_list:
-                sn_name = s["DBSnapshotIdentifier"]
-                sn_time = s["SnapshotCreateTime"]
-
-                if sn_name.find(snn_base) > -1 and \
-                        sn_time > final_esn_list[1]:
-                    final_esn_list.pop()
-                    final_esn_list.pop()
-                    final_esn_list.append(sn_name)
-                    final_esn_list.append(sn_time)
-                
-            response = client.restore_from_cluster_snapshot(
-                ClusterIdentifier=cid,
-                SnapshotIdentifier=final_esn_list[0],
-                Port=self.Port,
-                AvailabilityZone=self.azone,
-                PubliclyAccessible=True,
-                VpcSecurityGroupIds=vpccreds.access_key)
+            try:
             
-            dbdesc = client.describe_clusters(ClusterIdentifier=cid)
-            dbstate = dbdesc["Clusters"][0]["ClusterStatus"]
-            
-            while dbstate != "available":
                 dbdesc = client.describe_clusters(ClusterIdentifier=cid)
                 dbstate = dbdesc["Clusters"][0]["ClusterStatus"]
-                                         
-            self.log.info("Succesfully created!")
+                
+                if dbstate == "available":
+                    self.log.info("Cluster already available")
+                    sys.exit()
+                    
+            except:                    
+                            
+                existing_sn = client.describe_cluster_snapshots(
+                                    ClusterIdentifier=cid)
+                esn_list = existing_sn["Snapshots"]
+                
+                final_esn_list = list()
+                final_esn_list.append("test")
+                final_esn_list.append(
+                        utc.localize(datetime.utcnow()
+                            - timedelta(weeks=1000)))
+                for s in esn_list:
+                    sn_name = s["SnapshotIdentifier"]
+                    sn_time = s["SnapshotCreateTime"]
+    
+                    if sn_name.find(snn_base) > -1 and \
+                            sn_time > final_esn_list[1]:
+                        final_esn_list.pop()
+                        final_esn_list.pop()
+                        final_esn_list.append(sn_name)
+                        final_esn_list.append(sn_time)
+                    
+                response = client.restore_from_cluster_snapshot(
+                    ClusterIdentifier=cid,
+                    SnapshotIdentifier=final_esn_list[0],
+                    Port=self.Port,
+                    AvailabilityZone=self.azone,
+                    PubliclyAccessible=True,
+                    VpcSecurityGroupIds=[vpccreds.access_key])
+                
+                dbdesc = client.describe_clusters(ClusterIdentifier=cid)
+                dbstate = dbdesc["Clusters"][0]["ClusterStatus"]
+                
+                while dbstate != "available":
+                    dbdesc = client.describe_clusters(ClusterIdentifier=cid)
+                    dbstate = dbdesc["Clusters"][0]["ClusterStatus"]
+                time.sleep(100)                             
+                self.log.info("Succesfully created!")
             
         if self.modtype == "delete" and self.deltype == "with":
                response = client.delete_cluster(
