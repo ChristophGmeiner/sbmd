@@ -5,7 +5,7 @@ import configparser
 def dearchive(BUCKET,
               archives,
               index,
-              cfg="/home/ubuntu(sbmd/dwh.cfg"):
+              cfg="/home/ubuntu/sbmd/dwh.cfg"):
     '''
     dearchives failed archives
     :BUCKET: relevant S3 bucket
