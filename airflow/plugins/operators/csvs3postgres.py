@@ -46,9 +46,14 @@ class CSV_S3_PostgresOperator(BaseOperator):
 
     def execute(self, context):
         
-        if self.s3_key[-1] != "/":
-            self.s3_key = self.s3_key + "/"
-        
+        #if self.s3_key[-1] != "/":
+        #    self.s3_key = self.s3_key + "/"
+        print(self.s3_key)
+        print(self.s3_bucket)
+
+	self.log.info(self.s3_bucket)
+	self.log.info(self.s3_key)
+
         aws_hook = AwsHook(self.aws_creds)
         creds = aws_hook.get_credentials()
         pg_hook = PostgresHook(postgress_conn_id="postgres_aws_capstone")
