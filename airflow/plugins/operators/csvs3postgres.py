@@ -46,13 +46,10 @@ class CSV_S3_PostgresOperator(BaseOperator):
 
     def execute(self, context):
         
-        #if self.s3_key[-1] != "/":
-        #    self.s3_key = self.s3_key + "/"
-        print(self.s3_key)
-        print(self.s3_bucket)
-
-        self.log.info(self.s3_bucket)
-        self.log.info(self.s3_key)
+        if self.s3_key[0][-1] != "/":
+            self.s3_key = self.s3_key[0] + "/"
+        self.log.info(f"Use of bucket {self.s3_bucket}")
+        self.log.info(f"Use of key {self.s3_key}")
 
         aws_hook = AwsHook(self.aws_creds)
         creds = aws_hook.get_credentials()
@@ -60,7 +57,7 @@ class CSV_S3_PostgresOperator(BaseOperator):
         
         self.log.info("Start copying...")
         
-        s3_path = "s3://" + self.s3_bucket + "/" + self.s3_key
+        s3_path = "s3://" + self.s3_bucket + "/" + self.s3_key[0]
         formated_sql = CSV_S3_PostgresOperator.copy_sql.format(
                 self.table,
                 s3_path,
