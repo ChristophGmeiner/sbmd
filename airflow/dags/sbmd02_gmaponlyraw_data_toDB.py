@@ -10,7 +10,7 @@ from helpers import InsertTables
 
 default_args = {
         "owner": "Christoph Gmeiner",
-        "start_date": datetime(2020, 3, 3, 7, 56),
+        "start_date": datetime(2020, 3, 4, 8, 10),
         "retries": 0,
         "email": "christoph.gmeiner@gmail.com",
         "email_on_success": True,
@@ -21,7 +21,7 @@ default_args = {
 dag = DAG("test_sbmd02rawdatatoDB",
           description="Creates DBs and loads raw data from S3 to Postgres DB",
           default_args=default_args,
-          schedule_interval="56 7 * * 2",
+          schedule_interval="10 8 * * 3",
           max_active_runs=1,
           catchup=False)
 
@@ -57,8 +57,8 @@ transfer_gmap_data = CSV_S3_PostgresOperator(
         postgres_conn_id="postgres_aws_capstone",
         table="t_gmap01_stagings",
         s3_bucket="sbmd2gmap3",
-        s3_key="CSV",
-        s3_region="eu_central-1",
+        s3_key="CSV/",
+        s3_region="'eu-central-1'",
         dag=dag)
 
 insert_live_gmap_data = PostgresOperator(
@@ -99,7 +99,7 @@ archivecsv_task = ArchiveCSVS3(
         task_id="gzz_Archive_CSV_files",
         aws_creds="aws_credentials_s3",
         s3_bucket="sbmd2gmap3",
-        s3_source_key="CSVs/",
+        s3_source_key="CSV/",
         s3_dest_key="CSV_Archive/",
         s3_region_name="eu-central-1",
         dag=dag)
