@@ -109,7 +109,7 @@ except Exception as e:
         logging.error("Something went wrong...starting de-archiving!")
         logging.error(e)
         
-        dearchive(BUCKET, archivfoldername, 22)
+        dearchive(BUCKET, [archivfoldername], 22)
         
         logging.info("Succesfully dearchived!")
 
