@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.sbmd_plugin import RunGlueCrawlerOperator 
-from airflow.operators.s3_to_redshift_operator import S3ToRedshiftTransfer                            
+from airflow.operators.sbmd_plugin import S3CSVToRedshiftOperator                            
 from airflow.operators.sbmd_plugin import ModifyRedshift
 from airflow.operators.sbmd_plugin import ArchiveCSVS3
 from helpers import InsertTables
@@ -52,16 +52,15 @@ load_gmap_data = BashOperator(
         bash_command="python3 /home/ubuntu/sbmd/sbahnmuc04b_TransferDB.py",
         dag=dag)
 
-
-transfer_gmap_data = S3ToRedshiftTransfer(
+transfer_gmap_data = S3CSVToRedshiftOperator(
         task_id="g04b_Transfer_gmap_CSV",
-        schema="public",
-	table="t_gmap01_stagings",
+        table="t_gmap01_stagings",
         s3_bucket="sbmd2gmap3",
         s3_key="CSV/",
+        s3_region="eu-central-1",
         redshift_conn_id="redshift_aws_capstone",
         autocommit=True,
-        aws_conn_id="aws_credentials_s3",
+        aws_creds="aws_credentials_s3",
 	dag=dag)
 
 insert_live_gmap_data = PostgresOperator(
