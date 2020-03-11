@@ -16,7 +16,6 @@ class sbmd_plugin(AirflowPlugin):
             operators.ArchiveCSVS3
             ]
     helpers = [
-        helpers.CreateTables,
-        helpers.InsertTables
+       helpers.InsertTables
     ]
 
