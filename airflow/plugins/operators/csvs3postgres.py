@@ -51,8 +51,8 @@ class CSV_S3_PostgresOperator(BaseOperator):
         print(self.s3_key)
         print(self.s3_bucket)
 
-	self.log.info(self.s3_bucket)
-	self.log.info(self.s3_key)
+        self.log.info(self.s3_bucket)
+        self.log.info(self.s3_key)
 
         aws_hook = AwsHook(self.aws_creds)
         creds = aws_hook.get_credentials()
