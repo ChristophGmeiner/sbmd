@@ -31,11 +31,14 @@ class ArchiveCSVS3(BaseOperator):
         self.s3_dest_key = s3_dest_key
         self.s3_region_name = s3_region_name
         
-        #if self.s3_source_key[-1] != "/":
-        #    self.s3_source_key = self.s3_source_key + "/"
+        self.log.info(self.s3_source_key)
+        self.log.info(self.s3_dest_key)
+        
+        if self.s3_source_key[0][-1] != "/":
+            self.s3_source_key = self.s3_source_key[0] + "/"
             
-        #if self.s3_dest_key[-1] != "/":
-        #    self.s3_dest_key = self.s3_dest_key + "/"
+        if self.s3_dest_key[0][-1] != "/":
+            self.s3_dest_key = self.s3_dest_key[0] + "/"
         
     def execute(self, context):
         aws_hook = AwsHook(self.aws_creds)
@@ -57,6 +60,8 @@ class ArchiveCSVS3(BaseOperator):
         sea = self.s3_source_key    
         s3r_files = [x for x in s3r_files if x.find(sea) > -1]
         
+        self.log.info("Started archiving...")
+        
         for f in s3r_files:
                   
             copy_source = {"BUCKET": self.s3_bucket, 
@@ -64,3 +69,7 @@ class ArchiveCSVS3(BaseOperator):
             dest = s3res.Object(self.s3_bucket, self.s3_dest_key)
             dest.copy(CopySource=copy_source)
             response=s3res.Object(self.s3_bucket, f).delete()
+        
+        lenf = str(len(s3r_files))
+        
+        self.log.info(f"Succesfully archived {lenf} files!")
