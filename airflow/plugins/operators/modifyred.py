@@ -117,6 +117,7 @@ class ModifyRedshift(BaseOperator):
                 self.log.info("Succesfully created!")
             
         if self.modtype == "delete" and self.deltype == "with":
+               self.log.info(f"Started deleting with Snapshot: {snn}") 
                response = client.delete_cluster(
                             ClusterIdentifier=cid,
                             SkipFinalClusterSnapshot=False,
@@ -124,11 +125,14 @@ class ModifyRedshift(BaseOperator):
                             FinalClusterSnapshotRetentionPeriod=7
                             )
                time.sleep(600)
+               self.log.info(f"Succesfully deleted with Snapshot: {snn}")
                     
         if self.modtype == "delete" and self.deltype == "without":
+               self.log.info("Started deleting without Snapshot!") 
                response = client.delete_cluster(
                         ClusterIdentifier=cid,
                         SkipFinalClusterSnapshot=True,
                         FinalClusterSnapshotRetentionPeriod=1
                         )
                time.sleep(600)
+               self.log.info("Succesfully deleted without Snapshot!")
