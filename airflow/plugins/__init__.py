@@ -13,7 +13,8 @@ class sbmd_plugin(AirflowPlugin):
             operators.ModifyRDSPostgres,
             operators.CSV_S3_PostgresOperator,
             operators.ModifyRedshift,
-            operators.ArchiveCSVS3
+            operators.ArchiveCSVS3,
+            operators.S3CSVToRedshiftOperator
             ]
     helpers = [
        helpers.InsertTables
