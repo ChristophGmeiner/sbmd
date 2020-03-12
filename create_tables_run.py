@@ -11,7 +11,7 @@ def drop_tables(cur, conn):
     '''
     for t, query in zip(CreateTables.tabs, CreateTables.droptable_queries):
         cur.execute(query)
-        print("{} finished!".format(t))
+        print("{} dropped!".format(t))
         conn.commit()
 
 
@@ -23,7 +23,7 @@ def create_tables(cur, conn):
     '''
     for t, query in zip(CreateTables.tabs, CreateTables.createtable_queries):
         cur.execute(query)
-        print("{} finished!".format(t))
+        print("{} created!".format(t))
         conn.commit()
 
 
