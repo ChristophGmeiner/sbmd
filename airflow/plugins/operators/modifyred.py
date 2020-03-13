@@ -5,7 +5,6 @@ from airflow.contrib.hooks.aws_hook import AwsHook
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 import pytz
-import sys
 
 utc=pytz.UTC
 
@@ -75,7 +74,7 @@ class ModifyRedshift(BaseOperator):
                 
                 if dbstate == "available":
                     self.log.info("Cluster already available")
-                    sys.exit()
+                    
                     
             except:                    
                             
