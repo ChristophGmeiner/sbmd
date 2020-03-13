@@ -10,7 +10,7 @@ from helpers import InsertTables
 
 default_args = {
         "owner": "Christoph Gmeiner",
-        "start_date": datetime(2020, 3, 4, 9, 25),
+        "start_date": datetime(2020, 3, 6, 9, 35),
         "retries": 0,
         "email": "christoph.gmeiner@gmail.com",
         "email_on_success": True,
@@ -21,7 +21,7 @@ default_args = {
 dag = DAG("test_sbmd02rawdatatoDB",
           description="Creates DBs and loads raw data from S3 to Postgres DB",
           default_args=default_args,
-          schedule_interval="25 9 * * 3",
+          schedule_interval="35 9 * * 5",
           max_active_runs=1,
           catchup=False)
 
@@ -57,7 +57,7 @@ transfer_gmap_data = S3CSVToRedshiftOperator(
         table="t_gmap01_stagings",
         s3_bucket="sbmd2gmap3",
         s3_key="CSV/",
-        s3_region="eu-central-1",
+        s3_region="'eu-central-1'",
         redshift_conn_id="redshift_aws_capstone",
         autocommit=True,
         aws_creds="aws_credentials_s3",
