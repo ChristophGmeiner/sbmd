@@ -102,7 +102,7 @@ try:
 except Exception as e:
             
     if len(s3r_files) == 0:
-        print("Currently no files to load")
+        logging.info("Currently no files to load")
     
     else:
     

@@ -95,11 +95,17 @@ try:
     logging.info("Finished Copy")
     
 except Exception as e:
-    logging.error("Something went wrong...startind de-archiving!")
-    logging.error(e)
+            
+    if len(s3r_files) == 0:
+        logging.info("Currently no files to load")
     
-    dearchive(BUCKET, [archivfoldername], 25)
+    else:
     
-    logging.info("Succesfully dearchived!")
+        logging.error("Something went wrong...starting de-archiving!")
+        logging.error(e)
+        
+        dearchive(BUCKET, [archivfoldername], 25)
+        
+        logging.info("Succesfully dearchived!")
 
 t.toc()
