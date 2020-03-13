@@ -45,7 +45,7 @@ class ArchiveCSVS3(BaseOperator):
         creds = aws_hook.get_credentials()
         
         s3res = boto3.resource("s3", 
-                               region_name=self.region_name,
+                               region_name=self.s3_region_name,
                                aws_access_key_id=creds.access_key,
                                aws_secret_access_key=creds.secret_key)
         
