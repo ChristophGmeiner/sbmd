@@ -1,44 +1,29 @@
 from airflow import DAG
-from datetime import datetime, date, timedelta
+from datetime import datetime, timedelta
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.postgres_operator import PostgresOperator
-from airflow.operators.s3_to_redshift_operator import S3ToRedshiftTransfer
-from airflow.operators import RunGlueCrawlerOperator
+from airflow.operators.sbmd_plugin import RunGlueCrawlerOperator 
+from airflow.operators.sbmd_plugin import S3CSVToRedshiftOperator                             
+from airflow.operators.sbmd_plugin import ModifyRedshift
+from airflow.operators.sbmd_plugin import ArchiveCSVS3
 from helpers import InsertTables
 
 default_args = {
         "owner": "Christoph Gmeiner",
-        "start_date": datetime(2020, 3, 2, 7, 1),
+        "start_date": datetime(2020, 3, 4, 9, 25),
         "retries": 0,
         "email": "christoph.gmeiner@gmail.com",
         "email_on_success": True,
-        "email_on_failure": False,
+        "email_on_failure":True,
         "depends_on_past": False
         }
 
-dag = DAG("sbmd02rawdatatoDB",
-          description="Creates DBs and loads raw data from S3 to Postgres DB",
+dag = DAG("test_sbmd02rawdatatoDB",
+          description="Creates DBs and loads raw data from S3 to AWS Redshift",
           default_args=default_args,
-          schedule_interval="1 7 * * 1",
+          schedule_interval="25 9 * * 3",
           max_active_runs=1,
           catchup=False)
-
-create_DB_task = BashOperator(
-        task_id="02_create_DB_task",
-        bash_command=" python3 /home/ubuntu/sbmd/zzCreateDB.py",
-        sla=timedelta(minutes=15),
-        dag=dag)
-
-drop_stage_tables = PostgresOperator(
-        task_id="03_Drop_Old_Stage_Tables",
-        sql="""
-            DROP TABLE IF EXISTS t_db01_stagings;
-            DROP TABLE IF EXISTS t_gmap01_stagings;
-            DROP TABLE OF EXISTS t_w01_stagings;
-            """,
-        postgres_conn_id="postgres_aws_capstone",
-        autocommit=True,
-        dag=dag)
 
 load_train_data = BashOperator(
         task_id="01a_Load_train_Data",
@@ -55,44 +40,71 @@ load_weather_data = BashOperator(
         bash_command="python3 /home/ubuntu/sbmd/sbahnmuc05b_TransferDB.py",
         dag=dag)
 
-transfer_train_data = S3ToRedshiftTransfer(
-        task_id="04a_Transfer_train_CSV",
-        schema="sbmd",
+create_DB_task = ModifyRedshift(
+        task_id="02_create_DB_task",
+        aws_creds="aws_credentials_s3",
+        r_conn_id="redshift_modify",
+        modtype="create",
+        deltype="",
+        VpcSID ="postgres_sec_id",
+        dag=dag)
+
+archivecsv_task = ArchiveCSVS3(
+        task_id="gzz_Archive_CSV_files",
+        aws_creds="aws_credentials_s3",
+        s3_bucket="sbmd2gmap3",
+        s3_source_key="CSV",
+        s3_dest_key="CSV_Archive/",
+        s3_region_name="eu-central-1",
+        dag=dag)
+
+
+
+drop_stage_tables = PostgresOperator(
+        task_id="g03_Drop_Old_Stage_Tables",
+        sql="""
+            TRUNCATE TABLE t_db01_stagings;
+            TRUNCATE TABLE t_gmap01_stagings;
+            TRUNCATE TABLE t_w01_stagings;
+            """,
+        postgres_conn_id="redshift_aws_capstone",
+        autocommit=True,
+        retries=2,
+        retry_delay=timedelta(seconds=200),
+        dag=dag)
+
+transfer_train_data = S3CSVToRedshiftOperator(
+        task_id="g04a_Transfer_db_CSV",
         table="t_db01_stagings",
         s3_bucket="sbmd1db2",
-        s3_key="CSV2/" + str(date.today()) + "_DB_DF.csv",
-        redshift_conn_id="postgres_aws_capstone",
-        aws_conn_id="aws_credentials_s3",
+        s3_key="CSV/",
+        s3_region="eu-central-1",
+        redshift_conn_id="redshift_aws_capstone",
         autocommit=True,
-        trigger_rule="all_done",
-        dag=dag
-        )
+        aws_creds="aws_credentials_s3",
+        dag=dag)
 
-transfer_gmap_data = S3ToRedshiftTransfer(
-        task_id="04b_Transfer_gmap_CSV",
-        schema="sbmd",
+transfer_gmap_data = S3CSVToRedshiftOperator(
+        task_id="g04b_Transfer_gmap_CSV",
         table="t_gmap01_stagings",
         s3_bucket="sbmd2gmap3",
-        s3_key="CSV2/" + str(date.today()) + "_Gmap_DF.csv",
-        redshift_conn_id="postgres_aws_capstone",
-        aws_conn_id="aws_credentials_s3",
+        s3_key="CSV/",
+        s3_region="eu-central-1",
+        redshift_conn_id="redshift_aws_capstone",
         autocommit=True,
-        trigger_rule="all_done",
-        dag=dag
-        )
+        aws_creds="aws_credentials_s3",
+        dag=dag)
 
-transfer_weather_data = S3ToRedshiftTransfer(
+transfer_weather_data = S3CSVToRedshiftOperator(
         task_id="04c_Transfer_weather_CSV",
-        schema="sbmd",
         table="t_w01_stagings",
         s3_bucket="sbmd3weather2",
-        s3_key="CSV2/" + str(date.today()) + "_Weather_DF.csv",
-        redshift_conn_id="postgres_aws_capstone",
-        aws_conn_id="aws_credentials_s3",
+        s3_key="CSV/",
+        s3_region="eu-central-1",
+        redshift_conn_id="redshift_aws_capstone",
         autocommit=True,
-        trigger_rule="all_done",
-        dag=dag
-        )
+        aws_creds="aws_credentials_s3",
+        dag=dag)
 
 insert_live_train_data = PostgresOperator(
         task_id="05a_Insert_Train_Live_Tables",
@@ -118,18 +130,27 @@ insert_live_weather_data = PostgresOperator(
         trigger_rule="all_done",
         dag=dag)
 
-archive_del_db = BashOperator(
-        task_id="06bArchive_and_Delete_DB",
-        bash_command="python3 /home/ubuntu/sbmd/zzDelDB.py with",
-        trigger_rule="all_done",
-        sla=timedelta(minutes=15),
+archive_del_db = ModifyRedshift(
+        task_id="06aArchive_and_Delete_DB",
+        r_conn_id="redshift_modify",
+        aws_creds="aws_credentials_s3",
+        modtype="delete",
+        deltype="with",
+        VpcSID="postgres_sec_id",
+        retries=2,
+        retry_delay=timedelta(seconds=300),
         dag=dag)
 
-archiv_del_db_fail = BashOperator(
-        task_id="zz_Archive_and_Delete_DB_FailCase",
-        bash_command="python3 /home/ubuntu/sbmd/zzDelDB.py without",
+archiv_del_db_fail = ModifyRedshift(
+        task_id="06bArchive_and_Delete_DB_FailCase",
+        r_conn_id="redshift_modify",
+        aws_creds="aws_credentials_s3",
+        modtype="delete",
+        deltype="without",
+        VpcSID="postgres_sec_id",
         trigger_rule="one_failed",
-        sla=timedelta(minutes=15),
+        retries=2,
+        retry_delay=timedelta(seconds=300),
         dag=dag)
 
 startglue_task = RunGlueCrawlerOperator(
@@ -169,3 +190,7 @@ drop_stage_tables >> archiv_del_db_fail
 transfer_train_data >> archiv_del_db_fail
 transfer_gmap_data >> archiv_del_db_fail
 transfer_weather_data >> archiv_del_db_fail
+
+insert_live_train_data >> archiv_del_db_fail
+insert_live_gmap_data >> archiv_del_db_fail
+insert_live_weather_data >> archiv_del_db_fail
