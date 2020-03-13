@@ -49,17 +49,6 @@ create_DB_task = ModifyRedshift(
         VpcSID ="postgres_sec_id",
         dag=dag)
 
-archivecsv_task = ArchiveCSVS3(
-        task_id="gzz_Archive_CSV_files",
-        aws_creds="aws_credentials_s3",
-        s3_bucket="sbmd2gmap3",
-        s3_source_key="CSV",
-        s3_dest_key="CSV_Archive/",
-        s3_region_name="eu-central-1",
-        dag=dag)
-
-
-
 drop_stage_tables = PostgresOperator(
         task_id="g03_Drop_Old_Stage_Tables",
         sql="""
@@ -159,7 +148,14 @@ startglue_task = RunGlueCrawlerOperator(
         crawler="sbmd",
         dag=dag)
 
-##add glue job afterwards
+archivecsv_task = ArchiveCSVS3(
+        task_id="gzz_Archive_CSV_files",
+        aws_creds="aws_credentials_s3",
+        s3_bucket="sbmd2gmap3",
+        s3_source_key="CSV",
+        s3_dest_key="CSV_Archive/",
+        s3_region_name="eu-central-1",
+        dag=dag)
 
 load_train_data >> create_DB_task
 load_gmap_data >> create_DB_task
@@ -182,6 +178,10 @@ transfer_weather_data >> insert_live_weather_data
 insert_live_train_data >> archive_del_db
 insert_live_gmap_data >> archive_del_db
 insert_live_weather_data >> archive_del_db
+
+insert_live_train_data >> archivecsv_task
+insert_live_gmap_data >> archivecsv_task
+insert_live_weather_data >> archivecsv_task
 
 #failover part
 
