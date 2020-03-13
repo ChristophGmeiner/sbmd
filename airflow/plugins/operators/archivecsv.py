@@ -31,9 +31,6 @@ class ArchiveCSVS3(BaseOperator):
         self.s3_dest_key = s3_dest_key
         self.s3_region_name = s3_region_name
         
-        self.log.info(self.s3_source_key)
-        self.log.info(self.s3_dest_key)
-        
         if self.s3_source_key[0][-1] != "/":
             self.s3_source_key = self.s3_source_key[0] + "/"
             
@@ -52,10 +49,13 @@ class ArchiveCSVS3(BaseOperator):
         bucket = s3res.Bucket(self.s3_bucket)
         objsr_all = bucket.objects.all()
         
+        self.log.info(self.s3_source_key)
+        self.log.info(self.s3_dest_key)
+        
         s3r_files = []
         
         for o in objsr_all:
-            s3r_files.append(o)
+            s3r_files.append(o.key)
          
         sea = self.s3_source_key    
         s3r_files = [x for x in s3r_files if x.find(sea) > -1]
