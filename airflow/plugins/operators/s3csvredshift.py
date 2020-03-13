@@ -50,7 +50,7 @@ class S3CSVToRedshiftOperator(BaseOperator):
         self.s3_bucket = s3_bucket
         self.s3_key = s3_key
         self.s3_region = s3_region
-
+        
     def execute(self, context):
         aws_hook = AwsHook(self.aws_creds)
         creds = aws_hook.get_credentials()
@@ -68,6 +68,17 @@ class S3CSVToRedshiftOperator(BaseOperator):
         rs_hook.run(formated_sql)
         
         self.log.info('StageToRedshiftOperator finished!')
+        
+        check_sql = f"SELECT COUNT(*) FROM {self.table}"
+        
+        checkno = rs_hook.get_records(check_sql)
+        
+        if checkno == 0:
+            raise ValueError("No data transfered to Redshift!")
+            
+        
+        self.log.info("Data Quality check passed successfully!")
+        
 
 
 
