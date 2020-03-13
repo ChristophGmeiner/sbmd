@@ -10,7 +10,7 @@ from helpers import InsertTables
 
 default_args = {
         "owner": "Christoph Gmeiner",
-        "start_date": datetime(2020, 3, 4, 9, 25),
+        "start_date": datetime(2020, 3, 6, 9, 25),
         "retries": 0,
         "email": "christoph.gmeiner@gmail.com",
         "email_on_success": True,
@@ -18,10 +18,10 @@ default_args = {
         "depends_on_past": False
         }
 
-dag = DAG("test_sbmd02rawdatatoDB",
+dag = DAG("sbmd02rawdatatoDB",
           description="Creates DBs and loads raw data from S3 to AWS Redshift",
           default_args=default_args,
-          schedule_interval="25 9 * * 3",
+          schedule_interval="25 9 * * 5",
           max_active_runs=1,
           catchup=False)
 
