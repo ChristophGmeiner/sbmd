@@ -195,9 +195,9 @@ insert_live_train_data >> archive_del_db
 insert_live_gmap_data >> archive_del_db
 insert_live_weather_data >> archive_del_db
 
-insert_live_train_data >> archivecsv_task
-insert_live_gmap_data >> archivecsv_task
-insert_live_weather_data >> archivecsv_task
+insert_live_train_data >> archivecsv_db_task
+insert_live_gmap_data >> archivecsv_gmap_task
+insert_live_weather_data >> archivecsv_weather_task
 
 archivecsv_gmap_task >> startglue_task
 archivecsv_db_task >> startglue_task
