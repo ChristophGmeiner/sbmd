@@ -21,7 +21,7 @@ default_args = {
 dag = DAG("sbmd02rawdatatoDB",
           description="Creates DBs and loads raw data from S3 to AWS Redshift",
           default_args=default_args,
-          schedule_interval="25 9 * * 5",
+          schedule_interval="25 9 */2 * *",
           max_active_runs=1,
           catchup=False)
 
@@ -143,15 +143,35 @@ archiv_del_db_fail = ModifyRedshift(
         dag=dag)
 
 startglue_task = RunGlueCrawlerOperator(
-        task_id="zz_StartGlueCrawler",
+        task_id="08_StartGlueCrawler",
         region_name="eu-central-1",
         crawler="sbmd",
+	retries=2,
+	retry_delay=timedelta(seconds=300),
         dag=dag)
 
-archivecsv_task = ArchiveCSVS3(
-        task_id="gzz_Archive_CSV_files",
+archivecsv_gmap_task = ArchiveCSVS3(
+        task_id="07b_gmap_Archive_CSV_files",
         aws_creds="aws_credentials_s3",
         s3_bucket="sbmd2gmap3",
+        s3_source_key="CSV",
+        s3_dest_key="CSV_Archive/",
+        s3_region_name="eu-central-1",
+        dag=dag)
+
+archivecsv_db_task = ArchiveCSVS3(
+        task_id="07a_db_Archive_CSV_files",
+        aws_creds="aws_credentials_s3",
+        s3_bucket="sbmd1db2",
+        s3_source_key="CSV",
+        s3_dest_key="CSV_Archive/",
+        s3_region_name="eu-central-1",
+        dag=dag)
+
+archivecsv_weather_task = ArchiveCSVS3(
+        task_id="07c_weather_Archive_CSV_files",
+        aws_creds="aws_credentials_s3",
+        s3_bucket="sbmd3weather2",
         s3_source_key="CSV",
         s3_dest_key="CSV_Archive/",
         s3_region_name="eu-central-1",
@@ -160,10 +180,6 @@ archivecsv_task = ArchiveCSVS3(
 load_train_data >> create_DB_task
 load_gmap_data >> create_DB_task
 load_weather_data >> create_DB_task
-
-load_train_data >> startglue_task
-load_gmap_data >> startglue_task
-load_weather_data >> startglue_task
 
 create_DB_task >> drop_stage_tables
 
@@ -182,6 +198,10 @@ insert_live_weather_data >> archive_del_db
 insert_live_train_data >> archivecsv_task
 insert_live_gmap_data >> archivecsv_task
 insert_live_weather_data >> archivecsv_task
+
+archivecsv_gmap_task >> startglue_task
+archivecsv_db_task >> startglue_task
+archivecsv_weather_task >> startglue_task
 
 #failover part
 
