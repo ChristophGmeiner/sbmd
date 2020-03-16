@@ -99,6 +99,7 @@ This dag carries put the following steps:
 - Deleting the Amazon redshift cluster with a new snapshot.
 - Archiving the transferred csv files
 - Run a glue crawler on the archived csv files.
+- In case any database related step fails, the cluster gets deleted without a final snapshot. This way it gets assured, that no semi-finished data is loaded and unnecessary costs are avoided.
 
 I chose Amazon Redshift here, since the data should be stored in a relational way, but also shoud be queried in a high-performant way. Also the connection to the S3 bucket is very good configured with this technology.
 For cost saving reason the cluster is always deleted (with a snapshot) after the process.
@@ -210,14 +211,59 @@ This operator starts a defined glue crawler.
 ##### s3csvredshift.py
 This operator transfers defined csv files from an AWS S3 bucket to a defined Amazon Redshift cluster.
 
-### Redshit tables
-
 ## Data Modelling 
 
 ## Tables in Amazon Redshift
 Basically for all three data sources there is always one staging and one live table. The table names indicate what data source is covered by it. The staging tables contain the pure json/csv data without any formatting indexing etc for one loading process. 
 The live tables contain all the staged data cumulated, but these already have proper data types and primary keys. These tables are the basis for the modelling process and contain the same fields and information as the json files.
 Please see the create_table scripts for details on the tables.
+
+The main DWH model aims at answering all sort of questions on the traffic a´ll around the Gretáter Munich area, e.g. when are faster by train? What weather conditions benefits the car? etc.
+Therefore a star-schema based data model is created:
+
+![](sbmd_chart01_datamodel.png)
+
+- Fact Table:
+    - Duration of scheduled travel time in seconds
+    - Duration of real travel time in seconds
+    - Delay in seconds
+    - Keys:
+        - Transport Mean
+        - Datetime (hour based) of trip
+        - Connection Detail (Start and End of a trip on a detail, i.e. street or station, level)
+
+- Time Dimension
+    - Key:
+        - Datetime(hour based) of trip
+        - Year
+        - Month
+        - Day
+        - Weekday
+        - Is weekend?
+        - Hour
+
+- Transport Mean Dimension
+    - Key:
+        - Transport Mean (Car or train)
+
+- Connection Dimension
+    - Key:
+        - Connection Detail
+    - Start Detail Level
+    - Start city
+    - End detail level
+    - End city
+
+- Weather Dimension
+    - Key:
+        - Connection Detail   
+        - Datetime (hour based)
+    - Temperature
+    - Humidity
+    - Rain details
+    - Snow details
+    - Wind details
+    - Weather status
 
 ## Other Files
 
