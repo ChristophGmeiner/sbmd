@@ -108,7 +108,8 @@ class InsertTables:
                     duration_in_traffic_text, 
                     CAST(duration_in_traffic_value AS INT)
                 FROM t_gmap01_stagings
-                WHERE "timestamp" IS NOT NULL;
+                WHERE "timestamp" IS NOT NULL 
+                AND "timestamp" <> '';
                 """
     
     inssql3 = """
