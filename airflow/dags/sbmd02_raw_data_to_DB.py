@@ -191,8 +191,8 @@ transfer_train_data >> insert_live_train_data
 transfer_gmap_data >> insert_live_gmap_data
 transfer_weather_data >> insert_live_weather_data
 
-insert_live_train_data >> archive_del_db
-insert_live_gmap_data >> archive_del_db
+insert_live_train_data >> insert_live_gmap_data
+insert_live_gmap_data >> insert_live_weather_data
 insert_live_weather_data >> archive_del_db
 
 insert_live_train_data >> archivecsv_db_task
