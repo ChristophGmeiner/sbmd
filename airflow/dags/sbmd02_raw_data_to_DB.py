@@ -50,7 +50,7 @@ create_DB_task = ModifyRedshift(
         dag=dag)
 
 drop_stage_tables = PostgresOperator(
-        task_id="g03_Drop_Old_Stage_Tables",
+        task_id="03_Empty_Stage_Tables",
         sql="""
             TRUNCATE TABLE t_db01_stagings;
             TRUNCATE TABLE t_gmap01_stagings;
@@ -63,7 +63,7 @@ drop_stage_tables = PostgresOperator(
         dag=dag)
 
 transfer_train_data = S3CSVToRedshiftOperator(
-        task_id="g04a_Transfer_db_CSV",
+        task_id="04a_Transfer_db_CSV",
         table="t_db01_stagings",
         s3_bucket="sbmd1db2",
         s3_key="CSV/",
