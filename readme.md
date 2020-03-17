@@ -224,13 +224,13 @@ Therefore a star-schema based data model is created:
 ![](sbmd_chart01_datamodel.png)
 
 - Fact Table:
-    - Duration of scheduled travel time in seconds
-    - Duration of real travel time in seconds
+    - Duration of travel time in seconds (duration_sec)
     - Delay in seconds
     - Keys:
-        - Transport Mean
-        - Datetime (hour based) of trip
-        - Connection Detail (Start and End of a trip on a detail, i.e. street or station, level)
+        - Transport Mean (part_id)
+        - Datetime (hour based) of trip (time_id)
+        - Connection Detail (Start and End of a trip on a detail, i.e. street or station, level, conn_id)
+        - Weather_id
 
 - Time Dimension
     - Key:
@@ -256,14 +256,9 @@ Therefore a star-schema based data model is created:
 
 - Weather Dimension
     - Key:
-        - Connection Detail   
+        - Start location of connection Detail   
         - Datetime (hour based)
-    - Temperature
-    - Humidity
-    - Rain details
-    - Snow details
-    - Wind details
-    - Weather status
+    - diverse standard weather attributes
 
 ## Other Files
 
