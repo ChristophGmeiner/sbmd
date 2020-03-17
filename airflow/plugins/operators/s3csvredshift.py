@@ -100,6 +100,10 @@ class S3CSVToRedshiftOperator(BaseOperator):
             df = pd.read_csv(StringIO(csv_string))
             cols = list(df.columns)
             cols = ', '.join(cols)
+            
+            #for bringing sql fields in sql format
+            if 'timestamp' in cols:
+                cols[cols.index('timestamp')] = '"timestamp"'
                
             self.log.info(f"Copying file {ind} from S3 to Redshift for " 
                           + self.table)
