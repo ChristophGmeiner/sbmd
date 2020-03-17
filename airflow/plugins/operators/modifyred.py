@@ -121,7 +121,7 @@ class ModifyRedshift(BaseOperator):
                             ClusterIdentifier=cid,
                             SkipFinalClusterSnapshot=False,
                             FinalClusterSnapshotIdentifier=snn,
-                            FinalClusterSnapshotRetentionPeriod=7
+                            FinalClusterSnapshotRetentionPeriod=-1
                             )
                time.sleep(600)
                self.log.info(f"Succesfully deleted with Snapshot: {snn}")
