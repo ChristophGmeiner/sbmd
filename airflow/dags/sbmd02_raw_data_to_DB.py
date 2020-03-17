@@ -101,21 +101,21 @@ transfer_weather_data = S3CSVToRedshiftOperator(
 insert_live_train_data = PostgresOperator(
         task_id="05a_Insert_Train_Live_Tables",
         sql=InsertTables.delsql1 + " " + InsertTables.inssql1,
-        postgres_conn_id="postgres_aws_capstone",
+        postgres_conn_id="redshift_aws_capstone",
         autocommit=True,
         dag=dag)
 
 insert_live_gmap_data = PostgresOperator(
         task_id="05b_Insert_Gmap_Live_Tables",
         sql=InsertTables.delsql2 + " " + InsertTables.inssql2,
-        postgres_conn_id="postgres_aws_capstone",
+        postgres_conn_id="redshift_aws_capstone",
         autocommit=True,
         dag=dag)
 
 insert_live_weather_data = PostgresOperator(
         task_id="05c_Insert_Weather_Live_Tables",
         sql=InsertTables.delsql3 + " " + InsertTables.inssql3,
-        postgres_conn_id="postgres_aws_capstone",
+        postgres_conn_id="redshift_aws_capstone",
         autocommit=True,
         dag=dag)
 
