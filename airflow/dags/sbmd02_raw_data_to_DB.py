@@ -74,7 +74,7 @@ transfer_train_data = S3CSVToRedshiftOperator(
         dag=dag)
 
 transfer_gmap_data = S3CSVToRedshiftOperator(
-        task_id="g04b_Transfer_gmap_CSV",
+        task_id="04b_Transfer_gmap_CSV",
         table="t_gmap01_stagings",
         s3_bucket="sbmd2gmap3",
         s3_key="CSV/",
@@ -100,7 +100,6 @@ insert_live_train_data = PostgresOperator(
         sql=InsertTables.delsql1 + " " + InsertTables.inssql1,
         postgres_conn_id="postgres_aws_capstone",
         autocommit=True,
-        trigger_rule="all_done",
         dag=dag)
 
 insert_live_gmap_data = PostgresOperator(
@@ -108,7 +107,6 @@ insert_live_gmap_data = PostgresOperator(
         sql=InsertTables.delsql2 + " " + InsertTables.inssql2,
         postgres_conn_id="postgres_aws_capstone",
         autocommit=True,
-        trigger_rule="all_done",
         dag=dag)
 
 insert_live_weather_data = PostgresOperator(
@@ -116,7 +114,6 @@ insert_live_weather_data = PostgresOperator(
         sql=InsertTables.delsql3 + " " + InsertTables.inssql3,
         postgres_conn_id="postgres_aws_capstone",
         autocommit=True,
-        trigger_rule="all_done",
         dag=dag)
 
 archive_del_db = ModifyRedshift(
