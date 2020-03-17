@@ -146,8 +146,8 @@ startglue_task = RunGlueCrawlerOperator(
         task_id="08_StartGlueCrawler",
         region_name="eu-central-1",
         crawler="sbmd",
-	retries=2,
-	retry_delay=timedelta(seconds=300),
+        retries=2,
+        retry_delay=timedelta(seconds=300),
         dag=dag)
 
 archivecsv_gmap_task = ArchiveCSVS3(
@@ -196,7 +196,15 @@ insert_live_gmap_data >> insert_live_weather_data
 insert_live_weather_data >> archive_del_db
 
 insert_live_train_data >> archivecsv_db_task
+insert_live_gmap_data >> archivecsv_db_task
+insert_live_weather_data >> archivecsv_db_task
+
+insert_live_train_data >> archivecsv_gmap_task
 insert_live_gmap_data >> archivecsv_gmap_task
+insert_live_weather_data >> archivecsv_gmap_task
+
+insert_live_train_data >> archivecsv_weather_task
+insert_live_gmap_data >> archivecsv_weather_task
 insert_live_weather_data >> archivecsv_weather_task
 
 archivecsv_gmap_task >> startglue_task

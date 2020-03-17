@@ -31,11 +31,11 @@ class ArchiveCSVS3(BaseOperator):
         self.s3_dest_key = s3_dest_key
         self.s3_region_name = s3_region_name
         
-        if self.s3_source_key[0][-1] != "/":
-            self.s3_source_key = self.s3_source_key[0] + "/"
+        if self.s3_source_key[-1] != "/":
+            self.s3_source_key = self.s3_source_key + "/"
             
-        if self.s3_dest_key[0][-1] != "/":
-            self.s3_dest_key = self.s3_dest_key[0] + "/"
+        if self.s3_dest_key[-1] != "/":
+            self.s3_dest_key = self.s3_dest_key + "/"
         
     def execute(self, context):
         aws_hook = AwsHook(self.aws_creds)
