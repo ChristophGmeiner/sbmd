@@ -97,7 +97,7 @@ class S3CSVToRedshiftOperator(BaseOperator):
                     s3_path,
                     creds.access_key,
                     creds.secret_key,
-                    self.s3_region)
+                    "'" + self.s3_region + "'")
               
             rs_hook.run(formated_sql)
         
