@@ -71,6 +71,7 @@ transfer_train_data = S3CSVToRedshiftOperator(
         redshift_conn_id="redshift_aws_capstone",
         autocommit=True,
         aws_creds="aws_credentials_s3",
+        include_cols=False,
         dag=dag)
 
 transfer_gmap_data = S3CSVToRedshiftOperator(
@@ -82,6 +83,7 @@ transfer_gmap_data = S3CSVToRedshiftOperator(
         redshift_conn_id="redshift_aws_capstone",
         autocommit=True,
         aws_creds="aws_credentials_s3",
+        include_cols=True,
         dag=dag)
 
 transfer_weather_data = S3CSVToRedshiftOperator(
@@ -93,6 +95,7 @@ transfer_weather_data = S3CSVToRedshiftOperator(
         redshift_conn_id="redshift_aws_capstone",
         autocommit=True,
         aws_creds="aws_credentials_s3",
+        include_cols=True,
         dag=dag)
 
 insert_live_train_data = PostgresOperator(

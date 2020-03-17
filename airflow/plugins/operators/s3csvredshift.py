@@ -18,6 +18,15 @@ class S3CSVToRedshiftOperator(BaseOperator):
                     region {} 
                     CSV                    
                 """
+
+    copy_sql_excl = """
+                    COPY {}
+                    FROM '{}'
+                    ACCESS_KEY_ID '{}'
+                    SECRET_ACCESS_KEY '{}'
+                    region {} 
+                    CSV                    
+                """
        
 
     @apply_defaults
@@ -28,6 +37,7 @@ class S3CSVToRedshiftOperator(BaseOperator):
                  s3_bucket="",
                  s3_key="",
                  s3_region="",
+                 include_cols="",
                  *args, **kwargs):
         '''
         initialises the StageToRedshiftOperator, this is an operator, which 
@@ -45,6 +55,8 @@ class S3CSVToRedshiftOperator(BaseOperator):
             json raw data
         :s3_key - String indicating the file or path
         :s3_region: String indicating the relevant S3 AWS region
+        :include cols - True indicates that colnames are provided in the copy
+                        statement with the CSV header text
         '''
 
         super(S3CSVToRedshiftOperator, self).__init__(*args, **kwargs)
@@ -54,6 +66,7 @@ class S3CSVToRedshiftOperator(BaseOperator):
         self.s3_bucket = s3_bucket
         self.s3_key = s3_key
         self.s3_region = s3_region
+        self.include_cols = include_cols
         
     def execute(self, context):
         aws_hook = AwsHook(self.aws_creds)
@@ -91,13 +104,23 @@ class S3CSVToRedshiftOperator(BaseOperator):
             self.log.info(f"Copying file {ind} from S3 to Redshift for " 
                           + self.table)
             s3_path = "s3://" + self.s3_bucket + "/" + c
-            formated_sql = S3CSVToRedshiftOperator.copy_sql.format(
-                    self.table,
-                    cols,
-                    s3_path,
-                    creds.access_key,
-                    creds.secret_key,
-                    "'" + self.s3_region + "'")
+            
+            if self.include_cols == True:
+                formated_sql = S3CSVToRedshiftOperator.copy_sql.format(
+                        self.table,
+                        cols,
+                        s3_path,
+                        creds.access_key,
+                        creds.secret_key,
+                        "'" + self.s3_region + "'")
+            
+            else:
+                formated_sql = S3CSVToRedshiftOperator.copy_sql_excl.format(
+                        self.table,
+                        s3_path,
+                        creds.access_key,
+                        creds.secret_key,
+                        "'" + self.s3_region + "'")
               
             rs_hook.run(formated_sql)
         
