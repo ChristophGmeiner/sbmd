@@ -15,7 +15,7 @@ class Printer():
 
 config = configparser.ConfigParser()
 config.read("dwh.cfg")
-
+    
 os.environ['AWS_ACCESS_KEY_ID']=config['AWS']['KEY']
 os.environ['AWS_SECRET_ACCESS_KEY']=config['AWS']['SECRET']
 
