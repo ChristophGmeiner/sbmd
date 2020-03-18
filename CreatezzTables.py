@@ -38,6 +38,50 @@ class CreatezzTables:
                     FROM
                     t_gmap01_live
                     WHERE start_loc NOT LIKE '%-%';
+                    
+                    DELETE FROM zz_w_cities
+                    WHERE city_name IN (
+                    'Wessling',
+                    'Unterfoehring',
+                    'Unterfohring'
+                    'Tuerkenfeld',
+                    'Turkenfeld'
+                    'Schoengeising',
+                    'Schongeising',
+                    'Roehrmoos',
+                    'Rohrmoos',
+                    'Oberschleissheim'
+                    'Muehldorf am Inn',
+                    'Muhldorf am Inn',
+                    'Groebenzell',
+                    'Grobenzell',
+                    'Graefelfing',
+                    'Grafelfing',
+                    'Fuerstenfeldbruck',
+                    'Furstenfeldbruck',
+                    'Eichstaett',
+                    'Eichstatt',
+                    'Donauwoerth',
+                    'Donauworth',
+                    'Altomuenster'
+                    'Altomunster'
+                    );
+
+                    UPDATE zz_w_cities
+                    SET city_name = 'Unterschleißheim'
+                    WHERE city_name = 'Unterschleissheim';
+
+                    UPDATE zz_w_cities
+                    SET city_name = 'München'
+                    WHERE city_name = 'Munich';
+
+                    UPDATE zz_w_cities
+                    SET city_name = 'Nürnberg'
+                    WHERE city_name = 'Nuremberg';
+
+                    UPDATE zz_w_cities
+                    SET city_name = 'Kempten'
+                    WHERE city_name LIKE 'Kempten%';
                     """
     
     create_table2 = createsql + table2 + """ (
