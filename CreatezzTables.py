@@ -43,14 +43,14 @@ class CreatezzTables:
                     WHERE city_name IN (
                     'Wessling',
                     'Unterfoehring',
-                    'Unterfohring'
+                    'Unterfohring',
                     'Tuerkenfeld',
-                    'Turkenfeld'
+                    'Turkenfeld',
                     'Schoengeising',
                     'Schongeising',
                     'Roehrmoos',
                     'Rohrmoos',
-                    'Oberschleissheim'
+                    'Oberschleissheim',
                     'Muehldorf am Inn',
                     'Muhldorf am Inn',
                     'Groebenzell',
@@ -63,7 +63,7 @@ class CreatezzTables:
                     'Eichstatt',
                     'Donauwoerth',
                     'Donauworth',
-                    'Altomuenster'
+                    'Altomuenster',
                     'Altomunster'
                     );
 
