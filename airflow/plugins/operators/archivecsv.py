@@ -64,7 +64,7 @@ class ArchiveCSVS3(BaseOperator):
         
         for f in s3r_files:
                   
-            copy_source = {"BUCKET": self.s3_bucket, 
+            copy_source = {"Bucket": self.s3_bucket, 
                            "Key": f}
             dest = s3res.Object(self.s3_bucket, self.s3_dest_key)
             dest.copy(CopySource=copy_source)
