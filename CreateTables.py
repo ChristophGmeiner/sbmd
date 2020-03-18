@@ -14,12 +14,12 @@ class CreateTables:
             table2, table2s,
             table3, table3s]
     
-    drop_table1 = dropsql + table1 + "; "
-    drop_table2 = dropsql + table2 + "; "
-    drop_table3 = dropsql + table3 + "; "
-    drop_table1s = dropsql + table1s + "; "
-    drop_table2s = dropsql + table2s + "; "
-    drop_table3s = dropsql + table3s + "; "
+    drop_table1 = dropsql + table1 + " CASCADE; "
+    drop_table2 = dropsql + table2 + " CASCADE; "
+    drop_table3 = dropsql + table3 + " CASCADE; "
+    drop_table1s = dropsql + table1s + " CASCADE; "
+    drop_table2s = dropsql + table2s + " CASCADE; "
+    drop_table3s = dropsql + table3s + " CASCADE; "
     
     create_table1 = createsql + table1 + """ (db_id INT IDENTITY(0, 1) 
                     PRIMARY KEY SORTKEY, 
@@ -50,9 +50,9 @@ class CreateTables:
                     start_loc_lng VARCHAR, start_adress VARCHAR, 
                     end_loc_lat VARCHAR, end_loc_lng VARCHAR, 
                     end_adress VARCHAR, distance_text VARCHAR, 
-                    distance_value INT, duration_text VARCHAR, 
-                    duration_value INT, duration_traffic_text VARCHAR, 
-                    duration_traffic_value INT)
+                    distance_value FLOAT, duration_text VARCHAR, 
+                    duration_value FLOAT, duration_traffic_text VARCHAR, 
+                    duration_traffic_value FLOAT)
                     """
     
     create_table2s = createsql + table2s + """ (end_address VARCHAR,
@@ -109,9 +109,9 @@ class CreateTables:
     createtable_queries = [create_table1, create_table1s,
                            create_table2, create_table2s, 
                            create_table3, create_table3s]
-    droptable_queries = [drop_table1, drop_table1s,
-                         drop_table2, drop_table2s,
-                         drop_table3, drop_table3s]
+    droptable_queries = [drop_table1s, drop_table1,
+                         drop_table2s, drop_table2,
+                         drop_table3s, drop_table3]
 
 
 
