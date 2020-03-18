@@ -61,7 +61,7 @@ class InsertTables:
                     CAST("date" || ' ' || departure AS TIMESTAMP) AS departure,
                     CAST("date" || ' ' || arrival AS TIMESTAMP) AS arrival,
                     CAST(transfers AS INT),
-                    CAST("date" || ' ' || arrival AS TIMESTAMP) -  CAST("date" || ' ' || departure AS TIMESTAMP),
+                    (CAST("date" || ' ' || departure AS TIMESTAMP) -  CAST("date" || ' ' || arrival AS TIMESTAMP))/1000000,
                     products,
                     price,
                     CASE WHEN ontime = 'True' THEN 1 ELSE 0 END, 
@@ -72,6 +72,8 @@ class InsertTables:
                     CAST("date" AS DATE)
                 FROM
                 t_db01_stagings;
+                
+                DELETE FROM t_db01_live WHERE departure > arrival;
              """
     
     inssql2 = """
