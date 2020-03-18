@@ -176,6 +176,14 @@ class InsertTables:
                         CASE WHEN weather_wind_speed = '' THEN NULL ELSE CAST(weather_wind_speed AS FLOAT) END, 
                         TIMESTAMP 'epoch' + reception_time/1 * INTERVAL '1 second'
                         FROM t_w01_stagings;
+                        
+                        CALL SP01_Update_w01live_city_names();
+                        
+                        UPDATE t_w01_live
+                        SET temperature = temperature - 273.15,
+                        temperature_kf = temperature_kf - 273.15,
+                        temperature_max = temperature_max - 273.15,
+                        temperature_min = temperature_min - 273.15;
                 """
     
     delsql_list = [delsql1, delsql2, delsql3]
