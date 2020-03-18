@@ -33,7 +33,7 @@ if sys.argv[1] == "with":
             ClusterIdentifier=cid,
             SkipFinalClusterSnapshot=False,
             FinalClusterSnapshotIdentifier=snn,
-            FinalClusterSnapshotRetentionPeriod=7
+            FinalClusterSnapshotRetentionPeriod=-1
             )
 
 else:
