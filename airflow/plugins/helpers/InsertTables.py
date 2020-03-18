@@ -15,13 +15,13 @@ class InsertTables:
     delsql2 = """
                 DELETE FROM t_gmap01_stagings
                 WHERE end_address = 'end_address';
-    
+
                 DELETE FROM t_gmap01_live
-                WHERE CAST("timestamp" AS TIMESTAMP) || '_' || start_loc 
+                WHERE TO_TIMESTAMP(SUBSTRING("timestamp", 1, 19), 'YYYY-MM-DD HH24:MI:SS') || '_' || start_loc 
                 || '_' || end_loc
                 IN
                     (SELECT DISTINCT
-                        CAST("timestamp" AS TIMESTAMP) || '_' || stat1 || '_' 
+                        TO_TIMESTAMP(SUBSTRING("timestamp", 1, 19), 'YYYY-MM-DD HH24:MI:SS') || '_' || stat1 || '_' 
                         || stat2
                     FROM t_gmap01_stagings);
               """
@@ -94,7 +94,7 @@ class InsertTables:
                 SELECT DISTINCT
                     stat1,
                     stat2,
-                    CAST("timestamp" AS TIMESTAMP),
+                    TO_TIMESTAMP(SUBSTRING("timestamp", 1, 19), 'YYYY-MM-DD HH24:MI:SS'),
                     start_location_lat,
                     start_location_lng,
                     start_address,
@@ -102,11 +102,11 @@ class InsertTables:
                     end_location_lat,
                     end_address,
                     distance_text,
-                    CAST(distance_value AS INT),
+                    CASE WHEN distance_value = '' THEN NULL ELSE CAST(distance_value AS FLOAT) END,
                     duration_text,
-                    CAST(duration_value AS INT),
+                    CASE WHEN duration_value = '' THEN NULL ELSE CAST(duration_value AS FLOAT) END,
                     duration_in_traffic_text, 
-                    CAST(duration_in_traffic_value AS INT)
+                    CASE WHEN duration_in_traffic_value = '' THEN NULL ELSE CAST(duration_in_traffic_value AS FLOAT) END
                 FROM t_gmap01_stagings
                 WHERE "timestamp" IS NOT NULL 
                 AND "timestamp" <> '';
