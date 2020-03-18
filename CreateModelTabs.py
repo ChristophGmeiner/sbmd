@@ -3,14 +3,17 @@ class CreateModelTables:
     dropsql = "DROP TABLE IF EXISTS "
     createsql = "CREATE TABLE IF NOT EXISTS "
     inssql = "INSERT INTO "
+    truncsql = "TRUNCATE TABLE "
       
-    table1 = "t_w02_weather_codes'
+    table1 = "t_w02_weather_codes"
     table2 = "t_dim05_weather"
+    table3 = "t04_dim_part"
     
     tabs = [table1, table2]
     
     drop_table1 = dropsql + table1 + " CASCADE; "
     drop_table2 = dropsql + table2 + " CASCADE; "
+    drop_table3 = dropsql + table3 + " CASCADE; "
 
     create_table1 = createsql + table1 + """ (
                     weather_code INT NOT NULL SORTKEY,
@@ -56,10 +59,36 @@ class CreateModelTables:
                     FROM
                     t_w01_live;
                     """
-   
+       
+    trunc_table3 = truncsql + table3 + ";"
+        
+    create_table3 = createsql + table3 + """ (
+                    part_id INT NOT NULL SORTKEY,
+                    part_name VARCHAR NOT NULL)
+                    """
+    insert_table3 = inssql + table3 + """ 
+                    (
+                    part_id, 
+                    part_name)
+                    VALUES(
+                    2, 
+                    'gmap');
+                    """
+                    
+    insert_table3b = inssql + table3 + """ 
+                    (
+                    part_id, 
+                    part_name)
+                    VALUES(
+                    1, 
+                    'train');
+                    """
     
-    createtable_queries = [create_table1]
-    droptable_queries = [drop_table1]
+    createtable_queries = [create_table1, create_table2,
+                           create_table3]
+    droptable_queries = [drop_table1, drop_table2,
+                         drop_table3]
+
 
 
 
