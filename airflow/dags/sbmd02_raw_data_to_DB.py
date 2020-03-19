@@ -199,23 +199,15 @@ drop_stage_tables >> transfer_gmap_data
 drop_stage_tables >> transfer_weather_data
 
 transfer_train_data >> insert_live_train_data
+insert_live_train_data >> transfer_gmap_data
 transfer_gmap_data >> insert_live_gmap_data
+insert_live_gmap_data >> transfer_weather_data
 transfer_weather_data >> insert_live_weather_data
 
-insert_live_train_data >> insert_live_gmap_data
-insert_live_gmap_data >> insert_live_weather_data
 insert_live_weather_data >> archive_del_db
 
 insert_live_train_data >> archivecsv_db_task
-insert_live_gmap_data >> archivecsv_db_task
-insert_live_weather_data >> archivecsv_db_task
-
-insert_live_train_data >> archivecsv_gmap_task
 insert_live_gmap_data >> archivecsv_gmap_task
-insert_live_weather_data >> archivecsv_gmap_task
-
-insert_live_train_data >> archivecsv_weather_task
-insert_live_gmap_data >> archivecsv_weather_task
 insert_live_weather_data >> archivecsv_weather_task
 
 insert_live_train_data >> load_data_model
