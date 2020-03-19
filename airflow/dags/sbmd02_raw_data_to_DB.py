@@ -10,7 +10,6 @@ from helpers import InsertTables
 from helpers import DataModel
 from helpers import CreateModelTables
 
-
 default_args = {
         "owner": "Christoph Gmeiner",
         "start_date": datetime(2020, 3, 6, 9, 25),
@@ -196,13 +195,13 @@ create_DB_task >> drop_stage_tables
 
 drop_stage_tables >> transfer_train_data
 drop_stage_tables >> transfer_gmap_data
-drop_stage_tables >> transfer weather_data
+drop_stage_tables >> transfer_weather_data
 
 transfer_train_data >> insert_live_train_data
 transfer_gmap_data >> insert_live_train_data
 transfer_weather_data >> insert_live_train_data
 
-insert_live_train_data = insert_live_gmap_data
+insert_live_train_data >> insert_live_gmap_data
 insert_live_gmap_data >> insert_live_weather_data
 insert_live_weather_data >> archive_del_db
 
