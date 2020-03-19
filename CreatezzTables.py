@@ -82,6 +82,18 @@ class CreatezzTables:
                     UPDATE zz_w_cities
                     SET city_name = 'Kempten'
                     WHERE city_name LIKE 'Kempten%';
+                    
+                    UPDATE zz_w_cities
+                    SET start_loc = 'München'
+                    WHERE city_name = 'München';
+
+                    UPDATE zz_w_cities
+                    SET start_loc = 'Nürnberg'
+                    WHERE city_name = 'Nürnberg';
+                    
+                    UPDATE zz_w_cities
+                    SET start_loc = 'Unterschleißheim'
+                    WHERE city_name = 'Unterschleißheim';
                     """
     
     create_table2 = createsql + table2 + """ (
