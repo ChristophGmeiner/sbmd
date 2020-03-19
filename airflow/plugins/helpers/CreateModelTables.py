@@ -1,4 +1,4 @@
-1class CreateModelTables:
+class CreateModelTables:
 
     dropsql = "DROP TABLE IF EXISTS "
     createsql = "CREATE TABLE IF NOT EXISTS "

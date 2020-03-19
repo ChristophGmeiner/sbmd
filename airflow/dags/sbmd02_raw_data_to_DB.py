@@ -6,7 +6,7 @@ from airflow.operators.sbmd_plugin import RunGlueCrawlerOperator
 from airflow.operators.sbmd_plugin import S3CSVToRedshiftOperator                             
 from airflow.operators.sbmd_plugin import ModifyRedshift
 from airflow.operators.sbmd_plugin import ArchiveCSVS3
-from helpers import InsertTables, DataModel, CreateModelTabs
+from helpers import InsertTables, DataModel, CreateModelTables
 
 default_args = {
         "owner": "Christoph Gmeiner",
@@ -179,7 +179,7 @@ archivecsv_weather_task = ArchiveCSVS3(
 
 load_data_model = PostgresOperator(
         task_id="05c_Insert_Weather_Live_Tables",
-        sql=CreateModelTabs.insert_table2 + " " 
+        sql=CreateModelTables.insert_table2 + " " 
             + DataModel.comm,
         postgres_conn_id="redshift_aws_capstone",
         autocommit=True,
