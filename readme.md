@@ -89,7 +89,7 @@ After this has finished, the database will be saved in a snapshot and deleted ag
 
 This process is carried every two days and triggered via Apache Airflow on the same EC2 as for the data gathering process. Please see the DAG below:
 
-![](sbmd_dag02d.png)
+![](sbmd_dag02e.png)
 
 This dag carries put the following steps:
 
@@ -98,6 +98,7 @@ This dag carries put the following steps:
 - Truncating the staging tables.
 - Transferring the csv files from task 1 to the Amazon Redshift staging tables.
 - Inserting the staged data to live tables.
+- Creating the data model.
 - Deleting the Amazon redshift cluster with a new snapshot.
 - Archiving the transferred csv files
 - Run a glue crawler on the archived csv files.
