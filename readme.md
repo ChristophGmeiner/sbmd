@@ -33,7 +33,9 @@ If you choose other packages than Schiene, you could also expand the proces to a
 
 # Process and data pipeline
 
-The data pipeline consists of three steps
+The data pipeline consists of several steps. These are are shown in the chart below and described detailed after that.
+
+![](sbmd_dataflow01.png)
 
 ## Data gathering
 This process involves mainly web scrapping via the mentioned above APIs and storing each API request as a single json file in different S3 buckets (one for train, one for car and another one for weather data). This is carried out on an AWS EC2 and is scheduled via Apache Airflow. Also the start and stop of the EC2 could be scheduled on another (very low cost) EC2, which is always on (in case 24 hours request are not necessary.)
@@ -102,8 +104,9 @@ This dag carries put the following steps:
 - In case any database related step fails, the cluster gets deleted without a final snapshot. This way it gets assured, that no semi-finished data is loaded and unnecessary costs are avoided.
 
 I chose Amazon Redshift here, since the data should be stored in a relational way, but also shoud be queried in a high-performant way. Also the connection to the S3 bucket is very good configured with this technology.
+One advantage of an ordinary RDBMS would be the application of primary and foreign keys. Bit I've used other ways to ensure, that there are no duplicate records in the tables, by deleting staged data in live tables before inserting.
 For cost saving reason the cluster is always deleted (with a snapshot) after the process.
-For the possibility of continious analysing the data, the glue crawler is here. This way the csb data can be always analyzed by me in Amazon Athena.
+For the possibility of continious analysing the data, the glue crawler is here. This way the csv data can always be analyzed with Amazon Athena.
 
 ### Data sources
 All nested arrays in the json files below, will be spread across separate columns during the DB load process in the "b" scripts below.
