@@ -6,7 +6,10 @@ from airflow.operators.sbmd_plugin import RunGlueCrawlerOperator
 from airflow.operators.sbmd_plugin import S3CSVToRedshiftOperator                             
 from airflow.operators.sbmd_plugin import ModifyRedshift
 from airflow.operators.sbmd_plugin import ArchiveCSVS3
-from helpers import InsertTables, DataModel, CreateModelTables
+from helpers import InsertTables
+from helpers import DataModel
+from helpers import CreateModelTables
+
 
 default_args = {
         "owner": "Christoph Gmeiner",
