@@ -6,7 +6,7 @@ from airflow.operators.sbmd_plugin import RunGlueCrawlerOperator
 from airflow.operators.sbmd_plugin import S3CSVToRedshiftOperator                             
 from airflow.operators.sbmd_plugin import ModifyRedshift
 from airflow.operators.sbmd_plugin import ArchiveCSVS3
-from helpers import InsertTables
+from helpers import InsertTables, DataModel, CreateModelTabs
 
 default_args = {
         "owner": "Christoph Gmeiner",
@@ -21,7 +21,7 @@ default_args = {
 dag = DAG("sbmd02rawdatatoDB",
           description="Creates DBs and loads raw data from S3 to AWS Redshift",
           default_args=default_args,
-          schedule_interval="25 9 */2 * *",
+          #schedule_interval="25 9 */2 * *",
           max_active_runs=1,
           catchup=False)
 
@@ -177,6 +177,14 @@ archivecsv_weather_task = ArchiveCSVS3(
         s3_region_name="eu-central-1",
         dag=dag)
 
+load_data_model = PostgresOperator(
+        task_id="05c_Insert_Weather_Live_Tables",
+        sql=CreateModelTabs.insert_table2 + " " 
+            + DataModel.comm,
+        postgres_conn_id="redshift_aws_capstone",
+        autocommit=True,
+        dag=dag)
+
 load_train_data >> create_DB_task
 load_gmap_data >> create_DB_task
 load_weather_data >> create_DB_task
@@ -206,6 +214,10 @@ insert_live_weather_data >> archivecsv_gmap_task
 insert_live_train_data >> archivecsv_weather_task
 insert_live_gmap_data >> archivecsv_weather_task
 insert_live_weather_data >> archivecsv_weather_task
+
+insert_live_train_data >> load_data_model
+insert_live_gmap_data >> load_data_model
+insert_live_weather_data >> load_data_model
 
 archivecsv_gmap_task >> startglue_task
 archivecsv_db_task >> startglue_task

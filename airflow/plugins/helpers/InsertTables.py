@@ -183,7 +183,8 @@ class InsertTables:
                         SET temperature = temperature - 273.15,
                         temperature_kf = temperature_kf - 273.15,
                         temperature_max = temperature_max - 273.15,
-                        temperature_min = temperature_min - 273.15;
+                        temperature_min = temperature_min - 273.15
+                        WHERE temperature > 100;
                 """
     
     delsql_list = [delsql1, delsql2, delsql3]

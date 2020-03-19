@@ -17,6 +17,8 @@ class sbmd_plugin(AirflowPlugin):
             operators.S3CSVToRedshiftOperator
             ]
     helpers = [
-       helpers.InsertTables
+       helpers.InsertTables,
+       helpers.DataModel,
+       helpers.CreateModelTables
     ]
 
