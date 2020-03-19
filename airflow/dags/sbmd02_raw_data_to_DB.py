@@ -181,7 +181,7 @@ archivecsv_weather_task = ArchiveCSVS3(
         dag=dag)
 
 load_data_model = PostgresOperator(
-        task_id="05c_Insert_Weather_Live_Tables",
+        task_id="09_DataModel",
         sql=CreateModelTables.insert_table2 + " " 
             + DataModel.comm,
         postgres_conn_id="redshift_aws_capstone",
@@ -196,14 +196,14 @@ create_DB_task >> drop_stage_tables
 
 drop_stage_tables >> transfer_train_data
 drop_stage_tables >> transfer_gmap_data
-drop_stage_tables >> transfer_weather_data
+drop_stage_tables >> transfer weather_data
 
 transfer_train_data >> insert_live_train_data
-insert_live_train_data >> transfer_gmap_data
-transfer_gmap_data >> insert_live_gmap_data
-insert_live_gmap_data >> transfer_weather_data
-transfer_weather_data >> insert_live_weather_data
+transfer_gmap_data >> insert_live_train_data
+transfer_weather_data >> insert_live_train_data
 
+insert_live_train_data = insert_live_gmap_data
+insert_live_gmap_data >> insert_live_weather_data
 insert_live_weather_data >> archive_del_db
 
 insert_live_train_data >> archivecsv_db_task
