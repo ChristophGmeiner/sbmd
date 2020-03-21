@@ -5,6 +5,7 @@ import configparser
 def dearchive(BUCKET,
               archives,
               index,
+              pref,
               cfg="/home/ubuntu/sbmd/dwh.cfg"):
     '''
     dearchives failed archives
@@ -34,7 +35,7 @@ def dearchive(BUCKET,
             archivname = archivname + "/"
         
         s3r_files = []
-        for o in objsr_all.filter(Prefix=archivname):
+        for o in objsr_all.filter(Prefix=archivname + pref):
             s3r_files.append(o.key)
         
         for file in s3r_files:
