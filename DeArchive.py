@@ -34,9 +34,9 @@ def dearchive(BUCKET,
             archivname = archivname + "/"
         
         s3r_files = []
-        for o in objsr_all:
-            if o.key.find(archivname) > -1:
-                s3r_files.append(o.key)
+        for o in objsr_all.filter(Prefix=archivname):
+            #if o.key.find(archivname) > -1:
+            s3r_files.append(o.key)
         
         s3r_files = s3r_files[1:]
         
