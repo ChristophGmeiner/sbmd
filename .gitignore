@@ -4,10 +4,10 @@ station
 *ipynb_check*
 owm.txt
 *.json
-*.ipynb
 stamp*
 *.csv
 *__pycache__*
 .DS_Store
 *test*
 /logs
+/Old
