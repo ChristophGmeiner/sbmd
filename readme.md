@@ -31,6 +31,8 @@ In all cases the data is stored as json files (one per request) in separate AWS 
 Since all of the mentioned above packages work also in areas apart from the Greater Munich area, this process would also work in other parts of Germany or Europe.
 If you choose other packages than Schiene for train data, you could also expand the proces to all areas in the world.
 
+Before diving deep into details on the data engineering process: You can use the NB01 notebook for seeing some basic exploration of the finished DWH.
+
 # Process and data pipeline
 
 The data pipeline consists of several steps. These are are shown in the chart below and described detailed after that.
@@ -107,7 +109,7 @@ This dag carries out the following steps:
 I chose Amazon Redshift here, since the data should be stored in a relational way, but also shoud be queried in a high-performant way. Also the connection to the S3 bucket is very good configured with this technology.
 One advantage of an ordinary RDBMS would be the application of primary and foreign keys. But I've used other ways to ensure, that there are no duplicate records in the tables, by deleting staged data in live tables before inserting.
 For cost saving reason the cluster is always deleted (with a snapshot) after the process.
-For the possibility of continious analysing the data, the glue crawler is here. This way the csv data can always be analyzed with Amazon Athena.
+For the possibility of continious analysing the data, the glue crawler is here. This way the csv data can always be analyzed with Amazon Athena and a small first data lake is created.
 
 ### Data sources
 All nested arrays in the json files below, will be spread across separate columns during the DB load process in the "b" scripts below.
@@ -302,6 +304,9 @@ SQL query for initially creating some helper tables for data loading.
 
 All confidential AWS data is stored in a local config file and loaded to the scripts via configparser.
 
+### NB01_ExploreDWH.ipynb
+Notebook for doing basic exploration on the DWH.
+
 ### zz01_startVM1.py, zz02_StopVM1.py, zz01b_bash.sh, zz02b_bash.sh
 This scripts start or stop the productive VM
 
@@ -309,8 +314,15 @@ This scripts start or stop the productive VM
 Script used for deleting old json files, which are temporarily stored on disc of the EC2 during the data gathering process.
 
 ### systemd folder
-Systemd files for auto-start of Airflow services.
+Systemd files for auto-start of Airflow services
 
+## Next Steps
 
+- Create a data lake for analysing live data (based on Apache Spark)
+- Conect Amazon Redshift DWH to Amazon Quicksight or Microsoft Power BI for analysis
+- Maybe use delay datanfor automatic reimbursement claims
+- Do more specific data quality checks, like:
+    - is the data complete concerning stations and times?
+        - If no: Why?
 
 
