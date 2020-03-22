@@ -44,7 +44,7 @@ logging.info("Starting gather S3 files...")
 try: 
 
     s3r_files = []
-    for o in objsr_all:
+    for o in objsr_all.filter(Prefix="Gmap_2"):
         s3r_files.append(o.key)
     
     s3r_files = [x for x in s3r_files if x.find("/") == -1]
