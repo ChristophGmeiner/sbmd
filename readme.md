@@ -33,6 +33,11 @@ If you choose other packages than Schiene for train data, you could also expand 
 
 Before diving deep into details on the data engineering process: You can use the NB01 notebook for seeing some basic exploration of the finished DWH.
 
+## Project rubrics
+All tables and S3 buckets the project has more than 1 million records.
+I have used 3 different data sources.
+I have used several data formats, i.e. CSV, json, API.
+
 # Process and data pipeline
 
 The data pipeline consists of several steps. These are are shown in the chart below and described detailed after that.
