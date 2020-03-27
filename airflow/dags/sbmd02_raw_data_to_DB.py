@@ -182,7 +182,7 @@ archivecsv_weather_task = ArchiveCSVS3(
 load_data_model = PostgresOperator(
         task_id="09_DataModel",
         sql=CreateModelTables.wc_queries + " " 
-            + CreateModelTables.t05_queries + " " 
+                + CreateModelTables.t05_queries + " " 
             + DataModel.comm,
         postgres_conn_id="redshift_aws_capstone",
         autocommit=True,
