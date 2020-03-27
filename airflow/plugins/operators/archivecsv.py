@@ -47,7 +47,7 @@ class ArchiveCSVS3(BaseOperator):
                                aws_secret_access_key=creds.secret_key)
         
         bucket = s3res.Bucket(self.s3_bucket)
-        objsr_all = bucket.objects.all()
+        objsr_all = bucket.objects.filter(Prefix=self.s3_source_key)
         
         self.log.info(self.s3_source_key)
         self.log.info(self.s3_dest_key)
@@ -56,9 +56,6 @@ class ArchiveCSVS3(BaseOperator):
         
         for o in objsr_all:
             s3r_files.append(o.key)
-         
-        sea = self.s3_source_key    
-        s3r_files = [x for x in s3r_files if x.find(sea) > -1]
         
         self.log.info("Started archiving...")
         
@@ -66,7 +63,7 @@ class ArchiveCSVS3(BaseOperator):
                   
             copy_source = {"Bucket": self.s3_bucket, 
                            "Key": f}
-            dest = s3res.Object(self.s3_bucket, self.s3_dest_key)
+            dest = s3res.Object(self.s3_bucket, self.s3_dest_key + f[4:])
             dest.copy(CopySource=copy_source)
             response=s3res.Object(self.s3_bucket, f).delete()
         
