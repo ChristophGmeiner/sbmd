@@ -146,6 +146,7 @@ archiv_del_db_fail = ModifyRedshift(
 
 startglue_task = RunGlueCrawlerOperator(
         task_id="08_StartGlueCrawler",
+        aws_creds="aws_credentials_s3",
         region_name="eu-central-1",
         crawler="sbmd",
         retries=2,
