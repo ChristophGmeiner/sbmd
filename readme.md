@@ -96,7 +96,7 @@ After this has finished, the database will be saved in a snapshot and deleted ag
 
 This process is carried out every two days and triggered via Apache Airflow on the same EC2 as for the data gathering process. Please see the DAG below:
 
-![](sbmd_dag02f.png)
+![](sbmd_dag02g.png)
 
 This dag carries out the following steps:
 
