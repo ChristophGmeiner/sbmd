@@ -16,7 +16,6 @@ class CreateViews:
     create_view1 = createsql + view1 + """ 
                      AS
                     SELECT 
-                    weather_id,
                     g.start_loc || '_' || g.end_loc AS conn_detail,
                     TO_CHAR("timestamp"::DATETIME, 'yyyy-mm-dd HH24') AS dept_hour,
                     2 AS part,

@@ -33,6 +33,7 @@ class DataModel:
                 on gcs.start_loc = substring(vg.conn_detail, 1, CHARINDEX('_', vg.conn_detail) - 1)
                 LEFT JOIN zz_gmap_cities gce
                 on gce.start_loc = substring(vg.conn_detail, CHARINDEX('_', vg.conn_detail) + 1, 30)
+                WHERE (gcs.city_name || '_' || gce.city_name) IS NOT NULL
                 UNION
                 SELECT DISTINCT
                 vt.conn_detail_name,
@@ -46,7 +47,8 @@ class DataModel:
                 LEFT JOIN zz_db_cities dbcs
                 on dbcs.start_loc = substring(vt.conn_detail_name, 1, CHARINDEX('_', vt.conn_detail_name) - 1)
                 LEFT JOIN zz_db_cities dbce
-                on dbce.start_loc = substring(vt.conn_detail_name, CHARINDEX('_', vt.conn_detail_name) + 1, 50);
+                on dbce.start_loc = substring(vt.conn_detail_name, CHARINDEX('_', vt.conn_detail_name) + 1, 50)
+                WHERE (dbcs.city_name || '_' || dbce.city_name) IS NOT NULL;
                 """
     
     delsql2 = """
@@ -130,7 +132,8 @@ class DataModel:
                 ON dc.conn_detail_name = vt.conn_detail_name
                 LEFT JOIN t02_dim_time dt
                 ON dt.time_key = TO_TIMESTAMP(vt.dept_hour, 'YYYY-MM-DD HH24')
-                WHERE vt.w_id IS NOT NULL;
+                WHERE vt.w_id IS NOT NULL
+                AND dc.conn_id IS NOT NULL;
 
                 INSERT INTO t01_delay_fact (
                 conn_id,
@@ -157,8 +160,7 @@ class DataModel:
                 LEFT JOIN t05_dim_weather w
                 ON w.city = gc.city_name
                 AND w.dept_hour = TO_TIMESTAMP(g.dept_hour, 'YYYY-MM-DD HH24')
-                WHERE w.w_id IS NOT NULL AND g.real_duration_sec IS NOT NULL
-                ORDER BY w.w_id DESC;
+                WHERE w.w_id IS NOT NULL AND g.real_duration_sec IS NOT NULL;
     """
     
     datamodelc = [delsql1, inssql1, delsql2, inssql2, delsql3, inssql3]
