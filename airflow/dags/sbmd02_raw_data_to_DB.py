@@ -203,7 +203,6 @@ transfer_weather_data >> insert_live_train_data
 
 insert_live_train_data >> insert_live_gmap_data
 insert_live_gmap_data >> insert_live_weather_data
-insert_live_weather_data >> archive_del_db
 
 insert_live_train_data >> archivecsv_db_task
 insert_live_gmap_data >> archivecsv_gmap_task
@@ -217,6 +216,8 @@ archivecsv_gmap_task >> startglue_task
 archivecsv_db_task >> startglue_task
 archivecsv_weather_task >> startglue_task
 
+load_data_model >> archive_del_db
+
 #failover part
 
 drop_stage_tables >> archiv_del_db_fail
@@ -228,3 +229,5 @@ transfer_weather_data >> archiv_del_db_fail
 insert_live_train_data >> archiv_del_db_fail
 insert_live_gmap_data >> archiv_del_db_fail
 insert_live_weather_data >> archiv_del_db_fail
+
+load_data_model >> archiv_del_db_fail
