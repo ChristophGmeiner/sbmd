@@ -46,7 +46,7 @@ class DataModel:
                 LEFT JOIN zz_db_cities dbcs
                 on dbcs.start_loc = substring(vt.conn_detail_name, 1, CHARINDEX('_', vt.conn_detail_name) - 1)
                 LEFT JOIN zz_db_cities dbce
-                on dbce.start_loc = substring(vt.conn_detail_name, CHARINDEX('_', vt.conn_detail_name) + 1, 50)
+                on dbce.start_loc = substring(vt.conn_detail_name, CHARINDEX('_', vt.conn_detail_name) + 1, 50);
                 """
     
     delsql2 = """
@@ -93,7 +93,7 @@ class DataModel:
             EXTRACT(weekday FROM TO_TIMESTAMP(vt.dept_hour, 'YYYY-MM-DD HH24')) AS "weekday",
             CASE WHEN EXTRACT(weekday FROM TO_TIMESTAMP(vt.dept_hour, 'YYYY-MM-DD HH24')) IN (0, 6) THEN False ELSE True END AS is_weekend,
             EXTRACT(hour FROM TO_TIMESTAMP(vt.dept_hour, 'YYYY-MM-DD HH24')) AS "hour"
-            FROM v03_train_fact vt
+            FROM v03_train_fact vt;
             """
     
     delsql3 = """

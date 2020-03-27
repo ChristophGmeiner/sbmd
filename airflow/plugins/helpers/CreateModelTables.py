@@ -124,7 +124,7 @@ class CreateModelTables:
         
     create_table3 = createsql + table3 + """ (
                     part_id INT NOT NULL SORTKEY,
-                    part_name VARCHAR NOT NULL)
+                    part_name VARCHAR NOT NULL);
                     """
     insert_table3 = inssql + table3 + """ 
                     (
