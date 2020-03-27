@@ -152,8 +152,7 @@ class CreateModelTables:
     wc_queries = [drop_table1, create_table1, insert_table1]
     wc_queries = " ".join(wc_queries)
     
-    t05_queries = [drop_table2, create_table2, insert_table2]
-    t05_queries = " ".join(t05_queries)
+    t05_queries = insert_table2
     
 
 
