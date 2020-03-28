@@ -71,7 +71,7 @@ class CreateViews:
                         db.start_loc || '_' || db.end_loc AS conn_detail_name,
                         TO_CHAR(db.departure, 'YYYY-MM-DD HH24') AS dept_hour,
                         w.weather_id AS w_id,
-                        AVG(total_time) AS duration_sec,
+                        AVG(total_time) * -1 AS duration_sec,
                         AVG(total_delay) * 60 AS delay_sec
                         FROM
                         t_db01_live db
