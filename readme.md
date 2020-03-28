@@ -324,6 +324,17 @@ Script used for deleting old json files, which are temporarily stored on disc of
 ### systemd folder
 Systemd files for auto-start of Airflow services
 
+## Scenarios
+
+### The data was increased by 100%
+No issue at all. S3 buckets have no limit, also for Amazon Redshift this data volume is more than handable.
+
+### The pipelines would be run on a daily basis by 7 am every day
+This already takes places. So no issues here. In fact data gathering takes place 2 times every hour and the transferring and loading pipeline takes place once a day.
+
+### The database needed to be accessed by 100+ people.
+No issue for Amazon Redshift.
+
 ## Next Steps
 
 - Create a data lake for analysing live data (based on Apache Spark)
