@@ -30,20 +30,19 @@ def load_train(start, end, s3key, s3skey,
     c = s.connections(start, end)
     
     for conn in c:
-    
+            
         conn["date"] = str(datetime.date.today())
         conn["_id"] = (str(conn["date"]) + "_" + conn["departure"]
                            + "_" + start + "_" + end)
         conn["timestamp"] = str(datetime.datetime.now(
                                             tz=pytz.timezone("Europe/Berlin")))
-
-	if "delay" in conn.keys():
-        	conn["total_delay"] = (conn["delay"]["delay_departure"] 
-                	+ conn["delay"]["delay_arrival"])
-
-	else:
-		conn["total_delay"] = 0
-
+        
+        if "delay" in conn.keys():
+            conn["total_delay"] = (conn["delay"]["delay_departure"] 
+                    	+ conn["delay"]["delay_arrival"])
+        else:
+            conn["total_delay"] = 0
+    
         conn["start"] = start
         conn["end"] = end
 
