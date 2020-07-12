@@ -31,7 +31,7 @@ In all cases the data is stored as json files (one per request) in separate AWS 
 Since all of the mentioned above packages work also in areas apart from the Greater Munich area, this process would also work in other parts of Germany or Europe.
 If you choose other packages than Schiene for train data, you could also expand the proces to all areas in the world.
 
-Before diving deep into details on the data engineering process: You can use the NB01 notebook for seeing some basic exploration of the finished DWH.
+Before diving deep into details on the data engineering process: You can use the NB01 notebook for seeing some basic exploration of the finished DWH and NB02 for seeing some basic questions, which could be solved by the DWH.
 
 ## Project rubrics
 All tables and S3 buckets the project has more than 1 million records.
@@ -96,7 +96,7 @@ After this has finished, the database will be saved in a snapshot and deleted ag
 
 This process is carried out every two days and triggered via Apache Airflow on the same EC2 as for the data gathering process. Please see the DAG below:
 
-![](sbmd_dag02e.png)
+![](sbmd_dag02g.png)
 
 This dag carries out the following steps:
 
@@ -312,6 +312,9 @@ All confidential AWS data is stored in a local config file and loaded to the scr
 ### NB01_ExploreDWH.ipynb
 Notebook for doing basic exploration on the DWH.
 
+### NB02_First_Analysis.ipynb
+Notebook for basic domqin questions using the new DWH.
+
 ### zz01_startVM1.py, zz02_StopVM1.py, zz01b_bash.sh, zz02b_bash.sh
 This scripts start or stop the productive VM
 
@@ -320,6 +323,17 @@ Script used for deleting old json files, which are temporarily stored on disc of
 
 ### systemd folder
 Systemd files for auto-start of Airflow services
+
+## Scenarios
+
+### The data was increased by 100%
+No issue at all. S3 buckets have no limit, also for Amazon Redshift this data volume is more than handable.
+
+### The pipelines would be run on a daily basis by 7 am every day
+This already takes places. So no issues here. In fact data gathering takes place 2 times every hour and the transferring and loading pipeline takes place once a day.
+
+### The database needed to be accessed by 100+ people.
+No issue for Amazon Redshift.
 
 ## Next Steps
 
