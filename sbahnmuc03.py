@@ -31,30 +31,34 @@ def load_train(start, end, s3key, s3skey,
     
     for conn in c:
     
-        if "delay" in conn.keys():
-    
-            conn["date"] = str(datetime.date.today())
-            conn["_id"] = (str(conn["date"]) + "_" + conn["departure"]
+        conn["date"] = str(datetime.date.today())
+        conn["_id"] = (str(conn["date"]) + "_" + conn["departure"]
                            + "_" + start + "_" + end)
-            conn["timestamp"] = str(datetime.datetime.now(
+        conn["timestamp"] = str(datetime.datetime.now(
                                             tz=pytz.timezone("Europe/Berlin")))
-            conn["total_delay"] = (conn["delay"]["delay_departure"] 
-                + conn["delay"]["delay_arrival"])
-            conn["start"] = start
-            conn["end"] = end
-            
-            filename = "DB_" + conn["_id"] + ".json"
-            filename = filename.replace(":", "_")
-            filename = filename.replace(" ", "_")
-            
-            s3 = boto3.resource('s3',
-                                aws_access_key_id=s3key,
-                                aws_secret_access_key= s3skey)
-            
-            s3object = s3.Object("sbmd1db2", filename)
-            
-            s3object.put(Body=(bytes(json.dumps(conn)\
-                                     .encode('utf-8'))))
+
+	if "delay" in conn.keys():
+        	conn["total_delay"] = (conn["delay"]["delay_departure"] 
+                	+ conn["delay"]["delay_arrival"])
+
+	else:
+		conn["total_delay"] = 0
+
+        conn["start"] = start
+        conn["end"] = end
+
+        filename = "DB_" + conn["_id"] + ".json"
+        filename = filename.replace(":", "_")
+        filename = filename.replace(" ", "_")
+
+        s3 = boto3.resource('s3',
+                            aws_access_key_id=s3key,
+                            aws_secret_access_key= s3skey)
+
+        s3object = s3.Object("sbmd1db2", filename)
+
+        s3object.put(Body=(bytes(json.dumps(conn)\
+                                 .encode('utf-8'))))
 
 def load_trains_all(conns, s3key_p, s3skey_p):
     '''
