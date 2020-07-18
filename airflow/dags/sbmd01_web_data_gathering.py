@@ -6,7 +6,7 @@ import time
 
 default_args = {
         "owner": "Christoph Gmeiner",
-        "start_date": datetime(2020, 3, 6, 11, 0),
+        "start_date": datetime(2020, 7, 17, 11, 5),
         "retries": 1,
         "retry_delay": timedelta(seconds=60),
         "email": "christoph.gmeiner@gmail.com",
@@ -14,28 +14,29 @@ default_args = {
         "email_on_success": True,
         "depends_on_past": False,
         "trigger_rule": "all_done",
-        "sla": timedelta(minutes=59)
+        "sla": timedelta(minutes=4)
         }
 
-def wait(n=240):
+def wait(n=20):
     time.sleep(n)
 
 dag = DAG("sbmd01_web_data_gathering",
           description="Gathers all necessary web data",
           default_args=default_args,
-          schedule_interval="@hourly",
+          schedule_interval="*/15 3-19 * * *",
           max_active_runs=1,
           catchup=False)
 
 create_stations_task = BashOperator(
         task_id="01_create_stations_task",
         bash_command=" python3 /home/ubuntu/sbmd/sbahnmuc02.py",
-        sla=timedelta(seconds=90),
+        sla=timedelta(minutes=2),
         dag=dag)
 
 errorlogging_task = BashOperator(
         task_id="zz_errorlogging_task",
         bash_command=" python3 /home/ubuntu/sbmd/zz_check_01_logs.py",
+	sla=timedelta(minutes=1),
         dag=dag)
 
 conn_task_1 = BashOperator(
@@ -88,10 +89,10 @@ conn_task_10 = BashOperator(
         bash_command="python3 /home/ubuntu/sbmd/sbahnmuc03.py 9",
         dag=dag)
 
-gmap_task = BashOperator(
-        task_id="03_gmap_data",
-        bash_command="python3 /home/ubuntu/sbmd/sbahnmuc04_gmaps.py",
-        dag=dag)
+#gmap_task = BashOperator(
+#        task_id="03_gmap_data",
+#        bash_command="python3 /home/ubuntu/sbmd/sbahnmuc04_gmaps.py",
+#        dag=dag)
 
 weather_task = BashOperator(
         task_id= "04_weather_data",
@@ -172,6 +173,6 @@ t8 >> conn_task_9
 t8 >> t9
 
 t9 >> conn_task_10
-t9 >> gmap_task
+#t9 >> gmap_task
 
-gmap_task >> weather_task
+t9 >> weather_task
