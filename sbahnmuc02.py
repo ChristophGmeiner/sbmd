@@ -42,30 +42,31 @@ def main():
     potential_stations = ["München", "Puchheim", "Germering", 
                           "Fürstenfeldbruck", "Olching", "Gröbenzell", 
                           "Wolfratshausen", "Starnberg", "Gernlinden", 
-                          "Maisach", "Mammendorf", "Schöngeising", 
-                          "Geltendorf", "Buchenau", "Eichenau", "Murnau",
-                          "Hackherbrücke", "Holzkirchen", "Ebersberg", 
-                          "Grafing",  "Haar",  "Zorneding", "Freising", 
-                          "Rosenheim", "Augsburg", "Miesbach", "Eichstätt",
-                          "Ingolstadt", "Donauwörth", "Unterhaching", 
-                          "Geretsried", "Taufkirchen", "Erding", "Dachau", 
-                          "Steinebach", "Tutzing", "Feldafing", 
-                          "Mühldorf am Inn", "Deggendorf", "Landsberg", 
-                          "Landshut", "Nürnberg", "Grafrath", "Gräfelfing", 
-                          "Markt Schwaben", "Icking", "Kempten", "Planegg", 
-                          "Stockdorf", "Possenhofen", "Gauting", "Gilching", 
-                          "Türkenfeld", "Petershausen", "Röhrmoos", 
-                          "Hallbergmoos", "Ismaning", "Bayrischzell",
-                          "Unterföhring", "Daglfing", "Unterschleißheim",
-                          "Heimstetten", "Tegernsee", "Lenggries",
-                          "Aying", "Vaterstetten", "Baldham", "Steinebach",
-                          "Weßling", "Deisenhofen", "Sauerlach", "Otterfing", 
-                          "Kreuzstraße", "Ottobrunn", "Hohenbrunn", 
-                          "Mittenwald", "Oberschleißheim", "Eching", 
-                          "Neufahrn", "Altomünster", "Schwabhausen", 
-                          "Kolbermoor", "Bad Aibling", "Wasserburg am Inn", 
-                          "Waldkraiburg", "Schrobenhausen",
-                          "Garmisch-Partenkirchen", "Schliersee", "Gersthofen"]
+                          #"Maisach", "Mammendorf", "Schöngeising", 
+                          #"Geltendorf", "Buchenau", "Eichenau", "Murnau",
+                          #"Hackherbrücke", "Holzkirchen", "Ebersberg", 
+                          #"Grafing",  "Haar",  "Zorneding", "Freising", 
+                          #"Rosenheim", "Augsburg", "Miesbach", "Eichstätt",
+                          "Ingolstadt", "Donauwörth", "Unterhaching"]
+		          #				, 
+                          #"Geretsried", "Taufkirchen", "Erding", "Dachau", 
+                          #"Steinebach", "Tutzing", "Feldafing", 
+                          #"Mühldorf am Inn", "Deggendorf", "Landsberg", 
+                          #"Landshut", "Nürnberg", "Grafrath", "Gräfelfing", 
+                          #"Markt Schwaben", "Icking", "Kempten", "Planegg", 
+                          #"Stockdorf", "Possenhofen", "Gauting", "Gilching", 
+                          #"Türkenfeld", "Petershausen", "Röhrmoos", 
+                          #"Hallbergmoos", "Ismaning", "Bayrischzell",
+                          #"Unterföhring", "Daglfing", "Unterschleißheim",
+                          #"Heimstetten", "Tegernsee", "Lenggries",
+                          #"Aying", "Vaterstetten", "Baldham", "Steinebach",
+                          #"Weßling", "Deisenhofen", "Sauerlach", "Otterfing", 
+                          #"Kreuzstraße", "Ottobrunn", "Hohenbrunn", 
+                          #"Mittenwald", "Oberschleißheim", "Eching", 
+                          #"Neufahrn", "Altomünster", "Schwabhausen", 
+                          #"Kolbermoor", "Bad Aibling", "Wasserburg am Inn", 
+                          #"Waldkraiburg", "Schrobenhausen",
+                          #"Garmisch-Partenkirchen", "Schliersee", "Gersthofen"]
          
        
     real_stations = pool.map(all_station, [p for p in potential_stations])
@@ -81,10 +82,10 @@ def main():
     real_stations = [x for x in real_stations if x.find("Konstanz") == -1]
     real_stations = [x for x in real_stations if x.find("Kindsbach") == -1]
     
-    real_stations.remove("Taufkirchen an der Pram")
-    real_stations.remove("Steinebach an der Wied Ort")
-    real_stations.remove('Mittenwalde b Templin Dorf')
-    real_stations.remove("Haarhausen")
+    #real_stations.remove("Taufkirchen an der Pram")
+    #real_stations.remove("Steinebach an der Wied Ort")
+    #real_stations.remove('Mittenwalde b Templin Dorf')
+    #real_stations.remove("Haarhausen")
     
     add_stats = ["Puchheim Bahnhof Alpenstraße, Puchheim", 
                  "Bahnhofstraße, Eichenau", "Buchenau, Fürstenfeldbruck",
