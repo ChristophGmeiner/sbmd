@@ -22,20 +22,6 @@ class DataModel:
                 stat1_city,
                 stat2_city)
                 SELECT DISTINCT
-                vg.conn_detail AS conn_detail_name,
-                substring(vg.conn_detail, 1, CHARINDEX('_', vg.conn_detail) - 1) AS stat1,
-                substring(vg.conn_detail, CHARINDEX('_', vg.conn_detail) + 1, 30) AS stat2,
-                gcs.city_name || '_' || gce.city_name AS conn_city,
-                gcs.city_name AS stat1_city,
-                gce.city_name AS stat2_city
-                FROM v01_gmap_fact vg
-                LEFT JOIN zz_gmap_cities gcs
-                on gcs.start_loc = substring(vg.conn_detail, 1, CHARINDEX('_', vg.conn_detail) - 1)
-                LEFT JOIN zz_gmap_cities gce
-                on gce.start_loc = substring(vg.conn_detail, CHARINDEX('_', vg.conn_detail) + 1, 30)
-                WHERE (gcs.city_name || '_' || gce.city_name) IS NOT NULL
-                UNION
-                SELECT DISTINCT
                 vt.conn_detail_name,
                 substring(vt.conn_detail_name, 1, CHARINDEX('_', vt.conn_detail_name) - 1) AS stat1,
                 substring(vt.conn_detail_name, CHARINDEX('_', vt.conn_detail_name) + 1, 50) AS stat2,
@@ -75,17 +61,6 @@ class DataModel:
             "weekday",
             is_weekend,
             "hour")
-            SELECT DISTINCT
-            TO_TIMESTAMP(vg.dept_hour, 'YYYY-MM-DD HH24') AS time_key,
-            EXTRACT(year FROM TO_TIMESTAMP(vg.dept_hour, 'YYYY-MM-DD HH24')) AS "year",
-            EXTRACT(month FROM TO_TIMESTAMP(vg.dept_hour, 'YYYY-MM-DD HH24')) AS "month",
-            EXTRACT(week FROM TO_TIMESTAMP(vg.dept_hour, 'YYYY-MM-DD HH24')) AS "week",
-            EXTRACT(day FROM TO_TIMESTAMP(vg.dept_hour, 'YYYY-MM-DD HH24')) AS "day",
-            EXTRACT(weekday FROM TO_TIMESTAMP(vg.dept_hour, 'YYYY-MM-DD HH24')) AS "weekday",
-            CASE WHEN EXTRACT(weekday FROM TO_TIMESTAMP(vg.dept_hour, 'YYYY-MM-DD HH24')) IN (0, 6) THEN False ELSE True END AS is_weekend,
-            EXTRACT(hour FROM TO_TIMESTAMP(vg.dept_hour, 'YYYY-MM-DD HH24')) AS "hour"
-            FROM v01_gmap_fact vg
-            UNION
             SELECT DISTINCT
             TO_TIMESTAMP(vt.dept_hour, 'YYYY-MM-DD HH24') AS time_key,
             EXTRACT(year FROM TO_TIMESTAMP(vt.dept_hour, 'YYYY-MM-DD HH24')) AS "year",
@@ -134,33 +109,6 @@ class DataModel:
                 ON dt.time_key = TO_TIMESTAMP(vt.dept_hour, 'YYYY-MM-DD HH24')
                 WHERE vt.w_id IS NOT NULL
                 AND dc.conn_id IS NOT NULL;
-
-                INSERT INTO t01_delay_fact (
-                conn_id,
-                time_id,
-                part_id,
-                w_id,
-                duration_sec,
-                delay_sec)
-                SELECT 
-                dc.conn_id,
-                dt.time_id,
-                g.part AS part_id,
-                w.w_id,
-                g.real_duration_sec,
-                g.delay_sec
-                FROM
-                v01_gmap_fact g
-                LEFT JOIN t03_dim_conn dc
-                ON dc.conn_detail_name = g.conn_detail
-                LEFT JOIN t02_dim_time dt
-                ON dt.time_key = TO_TIMESTAMP(g.dept_hour, 'YYYY-MM-DD HH24')
-                LEFT JOIN zz_gmap_cities gc
-                ON gc.start_loc = SUBSTRING(g.conn_detail, 1, CHARINDEX('_', g.conn_detail) - 1)
-                LEFT JOIN t05_dim_weather w
-                ON w.city = gc.city_name
-                AND w.dept_hour = TO_TIMESTAMP(g.dept_hour, 'YYYY-MM-DD HH24')
-                WHERE w.w_id IS NOT NULL AND g.real_duration_sec IS NOT NULL;
     """
     
     datamodelc = [delsql1, inssql1, delsql2, inssql2, delsql3, inssql3]
