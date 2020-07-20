@@ -14,7 +14,7 @@ default_args = {
         "email_on_success": True,
         "depends_on_past": False,
         "trigger_rule": "all_done",
-        "sla": timedelta(minutes=4)
+        "sla": timedelta(minutes=14)
         }
 
 def wait(n=20):
@@ -23,7 +23,7 @@ def wait(n=20):
 dag = DAG("sbmd01_web_data_gathering",
           description="Gathers all necessary web data",
           default_args=default_args,
-          schedule_interval="*/15 3-19 * * *",
+          schedule_interval="*/15 3-18 * * *",
           max_active_runs=1,
           catchup=False)
 
