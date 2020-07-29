@@ -101,10 +101,7 @@ class S3CSVToRedshiftOperator(BaseOperator):
             cols = list(df.columns)
 
             #for bringing sql fields in sql format
-            #if 'timestamp' in cols:
-            #    cols[cols.index('timestamp')] = '"timestamp"'
-	    cols = ['"' + c + '"' for c in cols]
-
+            cols = ['"' + c + '"' for c in cols]
             cols = ', '.join(cols)
                            
             self.log.info(f"Copying file {ind} from S3 to Redshift for " 
@@ -129,8 +126,7 @@ class S3CSVToRedshiftOperator(BaseOperator):
                         "'" + self.s3_region + "'")
               
             rs_hook.run(formated_sql)
-        
-            self.log.info(f'StageToRedshiftOperator finished for file {ind}!')
+       	    self.log.info(f'StageToRedshiftOperator finished for file {ind}!')
             
             i += 1
         
