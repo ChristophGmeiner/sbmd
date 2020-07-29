@@ -101,8 +101,9 @@ class S3CSVToRedshiftOperator(BaseOperator):
             cols = list(df.columns)
 
             #for bringing sql fields in sql format
-            if 'timestamp' in cols:
-                cols[cols.index('timestamp')] = '"timestamp"'
+            #if 'timestamp' in cols:
+            #    cols[cols.index('timestamp')] = '"timestamp"'
+	    cols = ['"' + c + '"' for c in cols]
 
             cols = ', '.join(cols)
                            

@@ -72,7 +72,7 @@ transfer_train_data = S3CSVToRedshiftOperator(
         redshift_conn_id="redshift_aws_capstone",
         autocommit=True,
         aws_creds="aws_credentials_s3",
-        include_cols=False,
+        include_cols=True,
         dag=dag)
 
 #transfer_gmap_data = S3CSVToRedshiftOperator(
