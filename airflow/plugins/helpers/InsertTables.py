@@ -67,8 +67,8 @@ class InsertTables:
                     CASE WHEN ontime = 'True' THEN 1 ELSE 0 END, 
                     CASE WHEN canceled = 'True' THEN 1 ELSE 0 END,
                     CAST(total_delay AS INT),
-                    CAST(delay_delay_departure AS INT),
-                    CAST(delay_delay_arrival AS INT),
+                    CAST(NVL(delay_delay_departure, '0.0') AS FLOAT),
+                    CAST(NVL(delay_delay_arrival, '0.0') AS FLOAT),
                     CAST("date" AS DATE)
                 FROM
                 t_db01_stagings;
