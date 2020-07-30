@@ -16,7 +16,8 @@ class S3CSVToRedshiftOperator(BaseOperator):
                     ACCESS_KEY_ID '{}'
                     SECRET_ACCESS_KEY '{}'
                     region {} 
-                    CSV                    
+                    CSV
+                    BLANKSASNULL
                 """
 
     copy_sql_excl = """
@@ -25,7 +26,8 @@ class S3CSVToRedshiftOperator(BaseOperator):
                     ACCESS_KEY_ID '{}'
                     SECRET_ACCESS_KEY '{}'
                     region {} 
-                    CSV                    
+                    CSV
+                    BLANKSASNULL
                 """
        
 
