@@ -143,14 +143,14 @@ archiv_del_db_fail = ModifyRedshift(
         retry_delay=timedelta(seconds=300),
         dag=dag)
 
-startglue_task = RunGlueCrawlerOperator(
-        task_id="08_StartGlueCrawler",
-        aws_creds="aws_credentials_s3",
-        region_name="eu-central-1",
-        crawler="sbmd",
-        retries=2,
-        retry_delay=timedelta(seconds=300),
-        dag=dag)
+#startglue_task = RunGlueCrawlerOperator(
+#        task_id="08_StartGlueCrawler",
+#        aws_creds="aws_credentials_s3",
+#        region_name="eu-central-1",
+#        crawler="sbmd",
+#        retries=2,
+#        retry_delay=timedelta(seconds=300),
+#        dag=dag)
 
 #archivecsv_gmap_task = ArchiveCSVS3(
 #        task_id="07b_gmap_Archive_CSV_files",
@@ -214,8 +214,8 @@ insert_live_train_data >> load_data_model
 insert_live_weather_data >> load_data_model
 
 #archivecsv_gmap_task >> startglue_task
-archivecsv_db_task >> startglue_task
-archivecsv_weather_task >> startglue_task
+#archivecsv_db_task >> startglue_task
+#archivecsv_weather_task >> startglue_task
 
 load_data_model >> archive_del_db
 
