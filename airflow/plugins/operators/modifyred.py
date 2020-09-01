@@ -121,7 +121,7 @@ class ModifyRedshift(BaseOperator):
                             ClusterIdentifier=cid,
                             SkipFinalClusterSnapshot=False,
                             FinalClusterSnapshotIdentifier=snn,
-                            FinalClusterSnapshotRetentionPeriod=-1
+                            FinalClusterSnapshotRetentionPeriod=7
                             )
                time.sleep(600)
                self.log.info(f"Succesfully deleted with Snapshot: {snn}")
@@ -131,7 +131,7 @@ class ModifyRedshift(BaseOperator):
                response = client.delete_cluster(
                         ClusterIdentifier=cid,
                         SkipFinalClusterSnapshot=True,
-                        FinalClusterSnapshotRetentionPeriod=1
+                        FinalClusterSnapshotRetentionPeriod=7
                         )
                time.sleep(600)
                self.log.info("Succesfully deleted without Snapshot!")
